@@ -1,0 +1,5 @@
+com\onegolabs\scales\scales\ScalesCommandException.class
+com\onegolabs\scales\scales\ScalesErrorType.class
+com\onegolabs\scales\scales\aclas\AclasLoader.class
+com\onegolabs\scales\scales\ScalesLoaderFactory.class
+com\onegolabs\scales\scales\ScalesLoader.class
