@@ -1,0 +1,14 @@
+/.metadata/
+/.m2/
+
+**/CVS/
+
+**/.project
+**/.settings
+**/.classpath
+
+/.idea/
+**/*.iml
+
+**/target/
+**/log/
