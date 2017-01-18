@@ -1,25 +1,21 @@
 package com.onegolabs.wamanager;
 
-import com.onegolabs.wamanager.model.Article;
 import com.onegolabs.wamanager.model.TempData;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -27,6 +23,8 @@ import java.util.ResourceBundle;
  * @author dmzhg
  */
 public class WAManager extends Application {
+
+    public static ResourceBundle r;
 
     private Button refresh;
     private SplitPane mainSplitPane;
@@ -39,18 +37,16 @@ public class WAManager extends Application {
     private TableView<TempData> articlesTable;
 
     public static void main(String[] args) {
+        r = ResourceBundle.getBundle("language", new Locale("ru"));
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Locale locale = Locale.getDefault();
-        ResourceBundle myResources = ResourceBundle.getBundle("com.onegolabs.wamanager",
-                locale);
         window = primaryStage;
-
-        // TODO: localize correctly from resources
-        primaryStage.setTitle(myResources.getString("title"));
+        window.getIcons().add(new Image(getClass()
+                .getResourceAsStream("/icons/app_icon.png"), 100, 100, true, true));
+        primaryStage.setTitle(r.getString("title"));
         initRefreshButton();
         initUploadButton();
         initExitButton();
@@ -68,11 +64,11 @@ public class WAManager extends Application {
         bottomBorderPane = new BorderPane();
         mainSplitPane = new SplitPane(topBorderPane, bottomBorderPane);
         mainSplitPane.setOrientation(Orientation.VERTICAL);
-
+        mainSplitPane.setDividerPositions(0.75f);
         Scene scene = new Scene(mainSplitPane, 640, 480);
-        //mainSplitPane.setDividerPosition(0, 0.70);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        SplitPane.Divider a = new SplitPane.Divider();
+        window.setScene(scene);
+        window.show();
     }
 
     private void initArticlesTable() {
@@ -93,9 +89,12 @@ public class WAManager extends Application {
     }
 
     private void initExitButton() {
-        exit = new Button();
-        // TODO: localize correctly from resources
-        exit.setText("Exit");
+        ImageView icon = new ImageView
+                (new Image(getClass()
+                        .getResourceAsStream("/icons/exit.png"), 30, 30, true, true));
+        exit = new Button(r.getString("exit"), icon);
+        exit.setContentDisplay(ContentDisplay.TOP);
+        exit.setText(r.getString("exit"));
         exit.setMinHeight(60);
         exit.setMinWidth(60);
         exit.setOnAction(e -> {
@@ -105,19 +104,22 @@ public class WAManager extends Application {
     }
 
     private void initRefreshButton() {
-        refresh = new Button();
-        refresh.setLineSpacing(0.5);
-        // TODO: localize correctly from resources
-        refresh.setText(Locale.getDefault().getDisplayName());
+        ImageView icon = new ImageView
+                (new Image(getClass()
+                        .getResourceAsStream("/icons/refresh.png"), 30, 30, true, true));
+        refresh = new Button(r.getString("refresh"), icon);
+        refresh.setContentDisplay(ContentDisplay.TOP);
         refresh.setMinHeight(60);
         refresh.setMinWidth(60);
         refresh.setOnAction(e -> System.out.println("Refresh happened!"));
     }
 
     private void initUploadButton() {
-        upload = new Button();
-        // TODO: localize correctly from resources
-        upload.setText("Upload");
+        ImageView icon = new ImageView
+                (new Image(getClass()
+                        .getResourceAsStream("/icons/upload.png"), 30, 30, true, true));
+        upload = new Button(r.getString("upload"), icon);
+        upload.setContentDisplay(ContentDisplay.TOP);
         upload.setMinHeight(60);
         upload.setMinWidth(60);
         upload.setOnAction(e -> System.out.println("Upload happened!"));
