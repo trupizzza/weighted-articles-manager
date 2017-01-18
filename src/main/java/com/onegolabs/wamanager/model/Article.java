@@ -1,4 +1,4 @@
-package com.onegolabs.utils.wamanager.model;
+package com.onegolabs.wamanager.model;
 
 /**
  * @author dmzhg
@@ -16,6 +16,11 @@ public class Article {
     private int labelIndex;
     private int uniqueID;
 
+    public Article(int uniqueID, int materialNumber, double price) {
+        this.uniqueID = uniqueID;
+        this.materialNumber = materialNumber;
+        this.materialPrice = price;
+    }
     /**
      * @return the materialNumber
      */

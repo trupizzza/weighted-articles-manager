@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<SplitPane dividerPositions="0.7" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+  <items>
+      <BorderPane>
+         <top>
+            <HBox BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" prefHeight="65.0" prefWidth="60.0" text="Button">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" prefHeight="65.0" prefWidth="60.0" text="Button">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" prefHeight="65.0" prefWidth="60.0" text="Button">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+         </top>
+         <center>
+            <TableView prefHeight="170.0" prefWidth="598.0" BorderPane.alignment="CENTER">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
+         </center>
+         <bottom>
+            <GridPane BorderPane.alignment="BOTTOM_CENTER">
+              <columnConstraints>
+                  <ColumnConstraints hgrow="NEVER" maxWidth="64.0" minWidth="10.0" prefWidth="42.0" />
+                  <ColumnConstraints hgrow="NEVER" maxWidth="154.0" minWidth="10.0" prefWidth="154.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="313.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" prefWidth="38.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="51.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Label">
+                     <GridPane.margin>
+                        <Insets left="5.0" />
+                     </GridPane.margin>
+                  </Label>
+                  <TextField maxWidth="130.0" minHeight="20.0" prefHeight="25.0" prefWidth="70.0" GridPane.columnIndex="1" />
+                  <Label prefHeight="17.0" prefWidth="25.0" text="Label" GridPane.columnIndex="3" />
+                  <Label text="Label" GridPane.columnIndex="4" />
+               </children>
+            </GridPane>
+         </bottom>
+      </BorderPane>
+      <BorderPane />
+  </items>
+</SplitPane>

@@ -22,13 +22,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
-        <module name="weighted-articles-manager" />
         <module name="WeightedArticlesManager" />
+      </profile>
+      <profile default="false" name="Annotation profile for weighted-articles-manager" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="weighted-articles-manager" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="weighted-articles-manager" target="1.5" />
-      <module name="WeightedArticlesManager" target="1.5" />
+      <module name="weighted-articles-manager" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

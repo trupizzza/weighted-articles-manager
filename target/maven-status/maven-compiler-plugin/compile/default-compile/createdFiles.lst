@@ -1,5 +1,8 @@
-com\onegolabs\scales\scales\ScalesCommandException.class
-com\onegolabs\scales\scales\ScalesErrorType.class
-com\onegolabs\scales\scales\aclas\AclasLoader.class
-com\onegolabs\scales\scales\ScalesLoaderFactory.class
-com\onegolabs\scales\scales\ScalesLoader.class
+com\onegolabs\wamanager\model\Article.class
+com\onegolabs\scales\ScalesLoaderFactory.class
+com\onegolabs\scales\ScalesCommandException.class
+com\onegolabs\scales\ScalesErrorType.class
+com\onegolabs\scales\aclas\AclasLoader.class
+com\onegolabs\wamanager\WAManager.class
+com\onegolabs\scales\ScalesLoader.class
+com\onegolabs\scales\aclas\AclasLoaderFactory.class
