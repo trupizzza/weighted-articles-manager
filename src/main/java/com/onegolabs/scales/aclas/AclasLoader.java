@@ -4,6 +4,7 @@ import com.onegolabs.scales.ScalesCommandException;
 import com.onegolabs.scales.ScalesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.Properties;
 
 /**

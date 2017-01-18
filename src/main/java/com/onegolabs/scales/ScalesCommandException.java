@@ -42,7 +42,7 @@ public class ScalesCommandException extends Exception {
         if (str == null) {
             str = "";
         }
-        str += " [errorCode=" + errorCode + ", extendedErrorCode=" + extendedErrorCode + "]";
+        str += " [ErrorCode = " + errorCode + ", extendedErrorCode = " + extendedErrorCode + "]";
         return str;
     }
 }
