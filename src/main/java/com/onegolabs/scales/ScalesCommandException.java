@@ -22,7 +22,8 @@ public class ScalesCommandException extends Exception {
         this.extendedErrorCode = extendedErrorCode;
     }
 
-    public ScalesCommandException(String message, int errorCode, long extendedErrorCode) {
+    public ScalesCommandException(String message, int errorCode,
+                                  long extendedErrorCode) {
         super(message);
         this.errorCode = errorCode;
         this.extendedErrorCode = extendedErrorCode;
@@ -42,7 +43,8 @@ public class ScalesCommandException extends Exception {
         if (str == null) {
             str = "";
         }
-        str += " [ErrorCode = " + errorCode + ", extendedErrorCode = " + extendedErrorCode + "]";
+        str += " [ErrorCode = " + errorCode + ", extendedErrorCode = "
+                + extendedErrorCode + "]";
         return str;
     }
 }

@@ -9,7 +9,7 @@ public class Article {
     private String materialName;
     private String materialDescription;
     private double materialPrice;
-    private boolean isWeighed;
+    private boolean weighed;
     private int pluCode;
     private int expiryDaysCount;
     private String expiryDate;
@@ -38,10 +38,10 @@ public class Article {
     }
 
     /**
-     * @param name the materialName to set
+     * @param materialName the materialName to set
      */
-    public void setMaterialName(final String name) {
-        this.materialName = name;
+    public void setMaterialName(final String materialName) {
+        this.materialName = materialName;
     }
 
     /**
@@ -66,26 +66,27 @@ public class Article {
     }
 
     /**
-     * @param d the materialPrice to set
+     * @param price the materialPrice to set
      */
-    public void setMaterialPrice(double d) {
-        this.materialPrice = d;
+    public void setMaterialPrice(double price) {
+        this.materialPrice = price;
     }
 
     /**
-     * @return the isWeighed
+     * @return the weighed
      */
     public boolean isWeighed() {
-        return isWeighed;
+        return weighed;
     }
 
     /**
-     * @param isWeighedMaterial the isWeighed to set
+     * @param weighted the weighed to set
      */
-    public void setWeighed(String isWeighedMaterial) {
-        this.isWeighed =
-                isWeighedMaterial != null
-                        && !isWeighedMaterial.isEmpty() && isWeighedMaterial.equalsIgnoreCase("Y");
+    public void setWeighed(String weighted) {
+        this.weighed =
+                weighted != null
+                        && !weighted.isEmpty()
+                        && weighted.equalsIgnoreCase("Y");
     }
 
     /**
