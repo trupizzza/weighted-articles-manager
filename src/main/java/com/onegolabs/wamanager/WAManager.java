@@ -45,7 +45,7 @@ public class WAManager extends Application {
     public void start(Stage primaryStage) throws Exception {
         window = primaryStage;
         window.getIcons().add(new Image(getClass()
-                .getResourceAsStream("/icons/app_icon.png"), 100, 100, true, true));
+                .getResourceAsStream("/icons/app_icon.png"), 300, 300, false, false));
         primaryStage.setTitle(r.getString("title"));
         initRefreshButton();
         initUploadButton();
