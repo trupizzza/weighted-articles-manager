@@ -7,7 +7,7 @@
 **/.settings
 **/.classpath
 
-/.idea/
+.idea/
 **/*.iml
 
 **/target/
