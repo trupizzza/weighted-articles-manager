@@ -1,13 +1,14 @@
 package com.onegolabs.wamanager;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -17,79 +18,51 @@ import java.util.Properties;
  */
 public class Configuration {
 
-	private static final String CONFIG_FILE_NAME = "customConfig.properties";
+	private static final String CONFIG_FILE_NAME = "config.properties";
 	private static final String DEFAULT_CONFIG_FILE_NAME = "defaultConfig.properties";
-
-	private static Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
 
 	private Properties customConfig;
 	private Properties defaultConfig;
 
 	public void init() {
-		this.defaultConfig = loadDefault();
-		this.customConfig = loadCustom();
+		this.defaultConfig = loadConfig(DEFAULT_CONFIG_FILE_NAME);
+		this.customConfig = loadConfig(CONFIG_FILE_NAME);
 	}
 
 	public Properties getCustom() {
 		return customConfig;
 	}
 
-	public void setCustom(Properties config) {
-		this.customConfig = config;
-	}
-
 	public Properties getDefault() {
 		return defaultConfig;
 	}
 
-	public void setDefault(Properties config) {
-		this.defaultConfig = config;
-	}
-
 	/**
-	 * Loads default config bundled with app
-	 * If custom config has wrong property value or
-	 * doesn't have property/value at all - we'll take value from default config
-	 *
-	 * @return default properties for app
-	 */
-	private Properties loadDefault() {
-		Properties properties = null;
-		try {
-			InputStream input = WAManager.class.getClassLoader().getResourceAsStream(DEFAULT_CONFIG_FILE_NAME);
-			properties = new Properties();
-			properties.load(input);
-			logProperties(DEFAULT_CONFIG_FILE_NAME, properties);
-		} catch (FileNotFoundException e) {
-			showErrorMessage();
-		} catch (IOException e) {
-			LOGGER.error("Exception occurred while reading customConfig file");
-		}
-		return properties;
-	}
-
-
-	/**
-	 * Loads customer configuration file
-	 * File name must be 'config.properties'
+	 * Loads configuration file
 	 * If custom config has wrong property value or
 	 * doesn't have property/value at all - we'll take value from default config
 	 *
 	 * @return customer properties for app
 	 */
-	private Properties loadCustom() {
+	private Properties loadConfig(String configFileName) {
 		Properties properties = null;
+		InputStream input;
 		try {
+			input = this.getClass().getClassLoader().getResourceAsStream(configFileName);
+			if (input == null) {
+				// try to load from project folder
+				input = new FileInputStream(configFileName);
+			}
 			properties = new Properties();
-			properties.load(new FileInputStream("999"));
-			logProperties(CONFIG_FILE_NAME, properties);
+			properties.load(input);
+			logProperties(configFileName, properties);
 		} catch (FileNotFoundException e) {
-			LOGGER.error("Error while loading configuration file! " + e.getMessage());
-			LOGGER.error("File name :" + CONFIG_FILE_NAME);
-			LOGGER.error(e.toString());
-			showErrorMessage();
+			LOGGER.error("Error while loading configuration file " + configFileName, e);
+			showErrorMessage(e);
 		} catch (IOException e) {
 			e.printStackTrace();
+			showErrorMessage(e);
 		}
 		return properties;
 	}
@@ -114,13 +87,40 @@ public class Configuration {
 		LOGGER.debug(sb.toString());
 	}
 
-	private void showErrorMessage() {
+	private void showErrorMessage(Exception ex) {
 		String title = Messages.getString("errorLoadConfigTitle");
 		String message = Messages.getString("errorLoadConfigMessage");
 
 		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.setTitle(title);
+		alert.setTitle("Exception");
+		alert.setHeaderText(title);
 		alert.setContentText(message);
+
+		// Create expandable Exception.
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		ex.printStackTrace(pw);
+		String exceptionText = sw.toString();
+		String exceptionLabelError = Messages.getString("exceptionLabelError");
+		Label label = new Label(exceptionLabelError);
+
+		TextArea textArea = new TextArea(exceptionText);
+		textArea.setEditable(false);
+		textArea.setWrapText(true);
+
+		textArea.setMaxWidth(Double.MAX_VALUE);
+		textArea.setMaxHeight(Double.MAX_VALUE);
+		GridPane.setVgrow(textArea, Priority.ALWAYS);
+		GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+		GridPane expContent = new GridPane();
+		expContent.setMaxWidth(Double.MAX_VALUE);
+		expContent.add(label, 0, 0);
+		expContent.add(textArea, 0, 1);
+
+		// Set expandable Exception into the dialog pane.
+		alert.getDialogPane().setExpandableContent(expContent);
+		alert.getDialogPane().setExpanded(true);
 		alert.showAndWait();
 		System.exit(1);
 	}

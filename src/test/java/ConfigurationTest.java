@@ -1,5 +1,4 @@
 import com.onegolabs.wamanager.Configuration;
-import com.onegolabs.wamanager.WAManager;
 import junit.framework.TestCase;
 
 /**
@@ -8,11 +7,9 @@ import junit.framework.TestCase;
 public class ConfigurationTest extends TestCase {
 
 	private Configuration config;
-	private WAManager app;
 
 	@Override
 	protected void setUp() {
-		app = new WAManager();
 		config = new Configuration();
 	}
 
