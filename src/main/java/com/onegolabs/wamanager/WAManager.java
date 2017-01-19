@@ -12,8 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,9 +116,25 @@ public class WAManager extends Application {
 		articlesTable.setEditable(false);
 		articlesTable.setPrefHeight(500);
 		articlesTable.setPrefWidth(882);
-		articlesTable.getSelectionModel().selectedItemProperty().addListener(observable ->  {
-			if (articlesTable.getSelectionModel().getSelectedItem() != null) {
-				LOGGER.info("selected item index: " + articlesTable.getSelectionModel().getSelectedIndex());
+		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, tempData, t1) -> {
+			if (1 == 1) {
+				articlesTable.setBackground((new Background(new BackgroundFill(
+						Color.YELLOW,
+						CornerRadii.EMPTY,
+						Insets.EMPTY))));
+			}
+		});
+		articlesTable.setRowFactory(tv -> new TableRow<TempData>() {
+			@Override
+			public void updateItem(TempData item, boolean empty) {
+				super.updateItem(item, empty);
+				if (item == null) {
+					setStyle("");
+				} else if (item.getCode() == 1) {
+						setStyle("-fx-background-color: tomato;");
+				} else {
+					setStyle("");
+				}
 			}
 		});
 	}
@@ -141,8 +157,7 @@ public class WAManager extends Application {
 	}
 
 	private void initRefreshButton() {
-		ImageView icon = new ImageView(new Image(
-				getClass().getResourceAsStream("/icons/refresh.png"),
+		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/refresh.png"),
 				30,
 				30,
 				true,
