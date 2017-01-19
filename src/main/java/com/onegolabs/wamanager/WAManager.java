@@ -1,6 +1,7 @@
 package com.onegolabs.wamanager;
 
 import com.onegolabs.wamanager.model.TempData;
+import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,11 +15,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author dmzhg
  */
 public class WAManager extends Application {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WAManager.class);
 
 	private Button refresh;
 	private SplitPane mainSplitPane;
@@ -32,15 +37,12 @@ public class WAManager extends Application {
 	private Configuration settings;
 
 	public static void main(String[] args) {
-		launch(args);
-	}
-
-	public Configuration getSettings() {
-		return settings;
+		LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		settings = MyPreLoader.getConfiguration();
 		window = primaryStage;
 		initGUI();
 		window.show();
@@ -61,7 +63,7 @@ public class WAManager extends Application {
 	}
 
 	private void initMainWindow() {
-		Scene scene = new Scene(mainSplitPane, 640, 480);
+		Scene scene = new Scene(mainSplitPane);
 		window.setMaximized(true);
 		window.setScene(scene);
 	}
@@ -99,11 +101,14 @@ public class WAManager extends Application {
 
 	private void initArticlesTable() {
 		articlesTable = new TableView<>();
-		TableColumn code = new TableColumn("Code");
-		TableColumn name = new TableColumn("Name");
-		code.setCellValueFactory(new PropertyValueFactory<TempData, String>("code"));
-		name.setCellValueFactory(new PropertyValueFactory<TempData, String>("name"));
-		final ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First"));
+		TableColumn<TempData, String> code = new TableColumn<>(Messages.getString("code"));
+		TableColumn<TempData, String> name = new TableColumn<>(Messages.getString("name"));
+		code.setCellValueFactory(new PropertyValueFactory<>("code"));
+		name.setCellValueFactory(new PropertyValueFactory<>("name"));
+		ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First"));
+		data.add(new TempData(2, "Second"));
+		data.add(new TempData(3, "Third"));
+		data.add(new TempData(4, "Fourth"));
 		articlesTable.getColumns().addAll(code, name);
 		articlesTable.setItems(data);
 		articlesTable.setVisible(true);
@@ -111,11 +116,15 @@ public class WAManager extends Application {
 		articlesTable.setEditable(false);
 		articlesTable.setPrefHeight(500);
 		articlesTable.setPrefWidth(882);
+		articlesTable.getSelectionModel().selectedItemProperty().addListener(observable ->  {
+			if (articlesTable.getSelectionModel().getSelectedItem() != null) {
+				LOGGER.info("selected item index: " + articlesTable.getSelectionModel().getSelectedIndex());
+			}
+		});
 	}
 
 	private void initExitButton() {
-		ImageView icon = new ImageView(new Image(
-				getClass().getResourceAsStream("/icons/exit.png"),
+		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/exit.png"),
 				30,
 				30,
 				true,
@@ -146,8 +155,7 @@ public class WAManager extends Application {
 	}
 
 	private void initUploadButton() {
-		ImageView icon = new ImageView(new Image(
-				getClass().getResourceAsStream("/icons/upload.png"),
+		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/upload.png"),
 				30,
 				30,
 				true,
