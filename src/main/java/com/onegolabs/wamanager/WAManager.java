@@ -13,10 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +29,7 @@ public class WAManager extends Application {
     private SplitPane mainSplitPane;
     private BorderPane topBorderPane;
     private HBox topButtonBox;
-    private BorderPane bottomBorderPane;
+    private GridPane bottomGridPane;
     private Button upload;
     private Stage window;
     private Button exit;
@@ -41,10 +38,10 @@ public class WAManager extends Application {
     private GridPane bottomSearchAndInfoPane;
     private Label quickSearchLabel;
     private TextField quickSearchField;
-	private Label articlesCountInfoLabel;
+    private Label articlesCountInfoLabel;
     private Label articlesCountLabel;
-	private Label shortArticleDescription;
-	private Label fullArticleDescription;
+    private Label shortArticleDescription;
+    private TextArea fullArticleDescription;
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
@@ -60,7 +57,7 @@ public class WAManager extends Application {
     }
 
     private void initGUI() {
-		LOGGER.info("Initializing GUI...");
+        LOGGER.info("Initializing GUI...");
         initRefreshButton();
         initUploadButton();
         initExitButton();
@@ -68,30 +65,37 @@ public class WAManager extends Application {
         initPrimaryStage();
         initTopButtonBox();
         initTopBorderPane();
-        initBottomBorderPane();
+        initBottomGridPane();
         initMainSplitPane();
         initMainWindow();
-        bottomSearchAndInfoPane = new GridPane();
-        bottomSearchAndInfoPane.setMaxHeight(25);
-        bottomSearchAndInfoPane.setPadding(new Insets(5, 5, 5, 5));
+        initQuickSearchLabel();
+        initQuickSearchField();
+        initArticlesCountInfoLabel();
+        initArticlesCountLabel();
+        initBottomSearchAndInfoPane();
+        topBorderPane.setBottom(bottomSearchAndInfoPane);
+        topBorderPane.minWidthProperty().bind(window.getScene().widthProperty());
+        bottomGridPane.minWidthProperty().bind(window.getScene().widthProperty());
 
-        quickSearchLabel = new Label(Messages.getString("quickSearchLabel"));
-        quickSearchLabel.setGraphicTextGap(3);
-        quickSearchLabel.setMinSize(100, 25);
+        //LOWER PANEL
+        shortArticleDescription = new Label(Messages.getString("selectedArticleShortDesc"));
+        shortArticleDescription.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+        shortArticleDescription.setPadding(new Insets(0,5,5,5));
 
-        quickSearchField = new TextField();
-        quickSearchField.setMinSize(100, 25);
+        ColumnConstraints shortArticleDescriptionConstraints = new ColumnConstraints();
+        shortArticleDescriptionConstraints.setHgrow(Priority.ALWAYS);
 
-        articlesCountInfoLabel = new Label(Messages.getString("amountInfoLabel"));
-        articlesCountInfoLabel.setGraphicTextGap(3);
-        articlesCountInfoLabel.setMinSize(100, 25);
+        fullArticleDescription = new TextArea();
+        fullArticleDescription.setMaxWidth(Double.POSITIVE_INFINITY);
 
-        articlesCountLabel = new Label("666");
-        articlesCountLabel.setGraphicTextGap(3);
-        articlesCountLabel.setStyle("-fx-font-weight: bold");
-        articlesCountLabel.setMaxWidth(30);
-        articlesCountLabel.setMinSize(30, 25);
+        ColumnConstraints fullArticleDescriptionConstraints = new ColumnConstraints();
 
+        bottomGridPane.getColumnConstraints().addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
+        bottomGridPane.add(shortArticleDescription, 0, 0);
+        bottomGridPane.add(fullArticleDescription, 0, 1);
+    }
+
+    private void initBottomSearchAndInfoGridPaneConstraints() {
         ColumnConstraints quickSearchLabelConstraints = new ColumnConstraints();
         quickSearchLabelConstraints.setPercentWidth(6);
 
@@ -110,14 +114,45 @@ public class WAManager extends Application {
         bottomSearchAndInfoPane.getColumnConstraints().addAll(quickSearchLabelConstraints,
                 quickSearchFieldConstraints, splitterConstraints,
                 articlesCountInfoLabelConstraints, articlesCountLabelConstraints);
+    }
+
+    private void initArticlesCountLabel() {
+        articlesCountLabel = new Label("666");
+        articlesCountLabel.setGraphicTextGap(3);
+        articlesCountLabel.setStyle("-fx-font-weight: bold");
+        articlesCountLabel.setMaxWidth(30);
+        articlesCountLabel.setMinSize(30, 25);
+    }
+
+    private void initArticlesCountInfoLabel() {
+        articlesCountInfoLabel = new Label(Messages.getString("amountInfoLabel"));
+        articlesCountInfoLabel.setGraphicTextGap(3);
+        articlesCountInfoLabel.setMinSize(100, 25);
+    }
+
+    private void initQuickSearchField() {
+        quickSearchField = new TextField();
+        quickSearchField.setMinSize(100, 25);
+    }
+
+    private void initQuickSearchLabel() {
+        quickSearchLabel = new Label(Messages.getString("quickSearchLabel"));
+        quickSearchLabel.setGraphicTextGap(3);
+        quickSearchLabel.setMinSize(100, 25);
+    }
+
+    private void initBottomSearchAndInfoPane() {
+        bottomSearchAndInfoPane = new GridPane();
+        bottomSearchAndInfoPane.setMaxHeight(25);
+        bottomSearchAndInfoPane.minWidthProperty().bind(window.getScene().widthProperty());
+        bottomSearchAndInfoPane.setPadding(new Insets(5, 5, 5, 5));
+        initBottomSearchAndInfoGridPaneConstraints();
         GridPane.setHalignment(quickSearchLabel, HPos.LEFT);
         GridPane.setHalignment(quickSearchField, HPos.RIGHT);
         bottomSearchAndInfoPane.add(quickSearchLabel, 0, 0);
         bottomSearchAndInfoPane.add(quickSearchField, 1, 0);
         bottomSearchAndInfoPane.add(articlesCountInfoLabel, 3, 0);
         bottomSearchAndInfoPane.add(articlesCountLabel, 4, 0);
-
-        topBorderPane.setBottom(bottomSearchAndInfoPane);
     }
 
     private void initMainWindow() {
@@ -129,19 +164,18 @@ public class WAManager extends Application {
     }
 
     private void initMainSplitPane() {
-        mainSplitPane = new SplitPane(topBorderPane, bottomBorderPane);
+        mainSplitPane = new SplitPane(topBorderPane, bottomGridPane);
         mainSplitPane.setOrientation(Orientation.VERTICAL);
         mainSplitPane.setDividerPositions(0.75f);
     }
 
-    private void initBottomBorderPane() {
-        bottomBorderPane = new BorderPane();
+    private void initBottomGridPane() {
+        bottomGridPane = new GridPane();
+        bottomGridPane.setPadding(new Insets(5, 5, 5, 5));
     }
 
     private void initTopButtonBox() {
         topButtonBox = new HBox();
-        topButtonBox.setMaxHeight(100);
-        topButtonBox.setMinWidth(640);
         topButtonBox.setSpacing(5);
         topButtonBox.setPadding(new Insets(5, 5, 5, 5));
         topButtonBox.getChildren().addAll(refresh, upload, exit);
@@ -150,6 +184,7 @@ public class WAManager extends Application {
     private void initTopBorderPane() {
         topBorderPane = new BorderPane();
         topBorderPane.setTop(topButtonBox);
+        topBorderPane.setLeft(new Label());
         topBorderPane.setCenter(articlesTable);
     }
 
@@ -162,21 +197,32 @@ public class WAManager extends Application {
         articlesTable = new TableView<>();
         TableColumn<TempData, String> code = new TableColumn<>(Messages.getString("code"));
         TableColumn<TempData, String> name = new TableColumn<>(Messages.getString("name"));
+        TableColumn<TempData, String> description = new TableColumn<>(Messages.getString("description"));
+
         code.setCellValueFactory(new PropertyValueFactory<>("code"));
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
-        ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First"));
-        data.add(new TempData(2, "Second"));
-        data.add(new TempData(3, "Third"));
-        data.add(new TempData(4, "Fourth"));
-        articlesTable.getColumns().addAll(code, name);
+
+        description.setCellValueFactory(new PropertyValueFactory<>("description"));
+        ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First", "Description 1"));
+
+        data.add(new TempData(2, "Second", "Description 2"));
+        data.add(new TempData(3, "Third", "Description 3"));
+        data.add(new TempData(4, "Fourth", "Description 4"));
+        articlesTable.getColumns().addAll(code, name, description);
         articlesTable.setItems(data);
         articlesTable.setVisible(true);
         articlesTable.setEditable(false);
-        articlesTable.setPrefHeight(500);
-        articlesTable.setPrefWidth(882);
         articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, tempData, t1) -> {
-            // activates when selected
+           LOGGER.info(t1.toString());
+            updateInformation(t1);
+
         });
+    }
+
+    private void updateInformation(TempData t1) {
+        fullArticleDescription.setText(t1.toString());
+        shortArticleDescription.setText(t1.getName());
+
     }
 
     private void initExitButton() {

@@ -27,7 +27,7 @@ public class Configuration {
 
 	public void init() {
 		LOGGER.info("Loading default config");
-		this.defaultConfig = loadConfig("333");
+		this.defaultConfig = loadConfig(DEFAULT_CONFIG_FILE_NAME);
 		LOGGER.info("Loading custom config");
 		this.customConfig = loadConfig(CONFIG_FILE_NAME);
 	}
