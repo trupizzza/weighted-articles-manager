@@ -41,9 +41,10 @@ public class WAManager extends Application {
     private GridPane bottomSearchAndInfoPane;
     private Label quickSearchLabel;
     private TextField quickSearchField;
-    private Label splitterLabel;
-    private Label articlesCountInfoLabel;
+	private Label articlesCountInfoLabel;
     private Label articlesCountLabel;
+	private Label shortArticleDescription;
+	private Label fullArticleDescription;
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
@@ -59,6 +60,7 @@ public class WAManager extends Application {
     }
 
     private void initGUI() {
+		LOGGER.info("Initializing GUI...");
         initRefreshButton();
         initUploadButton();
         initExitButton();

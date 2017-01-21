@@ -26,7 +26,9 @@ public class Configuration {
 	private Properties defaultConfig;
 
 	public void init() {
-		this.defaultConfig = loadConfig(DEFAULT_CONFIG_FILE_NAME);
+		LOGGER.info("Loading default config");
+		this.defaultConfig = loadConfig("333");
+		LOGGER.info("Loading custom config");
 		this.customConfig = loadConfig(CONFIG_FILE_NAME);
 	}
 
