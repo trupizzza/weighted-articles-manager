@@ -42,6 +42,11 @@ public class WAManager extends Application {
     private Label articlesCountLabel;
     private Label shortArticleDescription;
     private TextArea fullArticleDescription;
+    private Label splitter;
+    private Label shopLabel;
+    private Label shopDescriptionLabel;
+    private Label scalesLabel;
+    private Label scalesDescriptionLabel;
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
@@ -53,7 +58,6 @@ public class WAManager extends Application {
         window = primaryStage;
         initGUI();
         window.show();
-
     }
 
     private void initGUI() {
@@ -70,6 +74,7 @@ public class WAManager extends Application {
         initMainWindow();
         initQuickSearchLabel();
         initQuickSearchField();
+        initSplitter();
         initArticlesCountInfoLabel();
         initArticlesCountLabel();
         initBottomSearchAndInfoPane();
@@ -78,38 +83,79 @@ public class WAManager extends Application {
         bottomGridPane.minWidthProperty().bind(window.getScene().widthProperty());
 
         //LOWER PANEL
-        shortArticleDescription = new Label(Messages.getString("selectedArticleShortDesc"));
-        shortArticleDescription.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
-        shortArticleDescription.setPadding(new Insets(0,5,5,5));
+        initShoreArticleDescriptionLabel();
+        initFullArticleDescriptionArea();
+        initShopLabel();
+        initShopDescriptionLabel();
+        initScalesLabel();
+        initScalesDescriptionLabel();
+        initBottomGridPaneElements();
 
-        ColumnConstraints shortArticleDescriptionConstraints = new ColumnConstraints();
-        shortArticleDescriptionConstraints.setHgrow(Priority.ALWAYS);
 
-        fullArticleDescription = new TextArea();
-        fullArticleDescription.setMaxWidth(Double.POSITIVE_INFINITY);
+        bottomGridPane.add(new HBox(), 0, 2);
+        bottomGridPane.add(new HBox(), 0, 2);
 
-        ColumnConstraints fullArticleDescriptionConstraints = new ColumnConstraints();
+    }
 
-        bottomGridPane.getColumnConstraints().addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
+    private void initScalesDescriptionLabel() {
+        scalesDescriptionLabel = new Label();
+    }
+
+    private void initScalesLabel() {
+        scalesLabel = new Label(Messages.getString("scales"));
+    }
+
+    private void initShopDescriptionLabel() {
+        shopDescriptionLabel = new Label();
+    }
+
+    private void initShopLabel() {
+        shopLabel = new Label(Messages.getString("shop"));
+
+    }
+
+    private void initBottomGridPaneElements() {
+        initBottomGridPaneconstraints();
+
         bottomGridPane.add(shortArticleDescription, 0, 0);
         bottomGridPane.add(fullArticleDescription, 0, 1);
     }
 
+    private void initBottomGridPaneconstraints() {
+        ColumnConstraints shortArticleDescriptionConstraints = new ColumnConstraints();
+        shortArticleDescriptionConstraints.setHgrow(Priority.ALWAYS);
+        ColumnConstraints fullArticleDescriptionConstraints = new ColumnConstraints();
+        bottomGridPane.getColumnConstraints().addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
+
+    }
+
+    private void initSplitter() {
+        splitter = new Label();
+    }
+
+    private void initFullArticleDescriptionArea() {
+        fullArticleDescription = new TextArea();
+        fullArticleDescription.setMaxWidth(Double.POSITIVE_INFINITY);
+    }
+
+    private void initShoreArticleDescriptionLabel() {
+        shortArticleDescription = new Label(Messages.getString("selectedArticleShortDesc"));
+        shortArticleDescription.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+        shortArticleDescription.setPadding(new Insets(0, 5, 5, 5));
+    }
+
     private void initBottomSearchAndInfoGridPaneConstraints() {
-        ColumnConstraints quickSearchLabelConstraints = new ColumnConstraints();
-        quickSearchLabelConstraints.setPercentWidth(6);
+        ColumnConstraints quickSearchLabelConstraints = new ColumnConstraints(100);
 
-        ColumnConstraints quickSearchFieldConstraints = new ColumnConstraints();
-        quickSearchFieldConstraints.setPercentWidth(10);
+        ColumnConstraints quickSearchFieldConstraints = new ColumnConstraints(130);
 
-        ColumnConstraints splitterConstraints = new ColumnConstraints();
-        splitterConstraints.setPercentWidth(75);
+        ColumnConstraints splitterConstraints = new ColumnConstraints(100, 100, Double.MAX_VALUE);
+        splitterConstraints.setHgrow(Priority.ALWAYS);
 
-        ColumnConstraints articlesCountInfoLabelConstraints = new ColumnConstraints();
-        articlesCountInfoLabelConstraints.setPercentWidth(6);
+        ColumnConstraints articlesCountInfoLabelConstraints = new ColumnConstraints(100);
 
-        ColumnConstraints articlesCountLabelConstraints = new ColumnConstraints();
-        articlesCountLabelConstraints.setPercentWidth(2);
+        ColumnConstraints articlesCountLabelConstraints = new ColumnConstraints(50);
+        articlesCountInfoLabelConstraints.setHalignment(HPos.RIGHT);
 
         bottomSearchAndInfoPane.getColumnConstraints().addAll(quickSearchLabelConstraints,
                 quickSearchFieldConstraints, splitterConstraints,
@@ -132,13 +178,12 @@ public class WAManager extends Application {
 
     private void initQuickSearchField() {
         quickSearchField = new TextField();
-        quickSearchField.setMinSize(100, 25);
+        quickSearchField.setPromptText(Messages.getString("enterArticleCode"));
     }
 
     private void initQuickSearchLabel() {
         quickSearchLabel = new Label(Messages.getString("quickSearchLabel"));
         quickSearchLabel.setGraphicTextGap(3);
-        quickSearchLabel.setMinSize(100, 25);
     }
 
     private void initBottomSearchAndInfoPane() {
@@ -147,10 +192,10 @@ public class WAManager extends Application {
         bottomSearchAndInfoPane.minWidthProperty().bind(window.getScene().widthProperty());
         bottomSearchAndInfoPane.setPadding(new Insets(5, 5, 5, 5));
         initBottomSearchAndInfoGridPaneConstraints();
-        GridPane.setHalignment(quickSearchLabel, HPos.LEFT);
-        GridPane.setHalignment(quickSearchField, HPos.RIGHT);
+       // bottomSearchAndInfoPane.setGridLinesVisible(true);
         bottomSearchAndInfoPane.add(quickSearchLabel, 0, 0);
         bottomSearchAndInfoPane.add(quickSearchField, 1, 0);
+        bottomGridPane.add(splitter, 2, 0);
         bottomSearchAndInfoPane.add(articlesCountInfoLabel, 3, 0);
         bottomSearchAndInfoPane.add(articlesCountLabel, 4, 0);
     }
@@ -213,9 +258,8 @@ public class WAManager extends Application {
         articlesTable.setVisible(true);
         articlesTable.setEditable(false);
         articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, tempData, t1) -> {
-           LOGGER.info(t1.toString());
+            LOGGER.info(t1.toString());
             updateInformation(t1);
-
         });
     }
 
