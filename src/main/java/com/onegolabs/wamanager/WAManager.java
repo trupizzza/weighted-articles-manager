@@ -8,12 +8,14 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,9 @@ public class WAManager extends Application {
     private Label shopDescriptionLabel;
     private Label scalesLabel;
     private Label scalesDescriptionLabel;
+    private GridPane shopAndScalesBottomPane;
+    private Label validUntilLabel;
+    private Label validUntilField;
 
     public static void main(String[] args) {
         LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
@@ -89,6 +94,7 @@ public class WAManager extends Application {
         initShopDescriptionLabel();
         initScalesLabel();
         initScalesDescriptionLabel();
+        initShopAndScalesBottomPane();
         initBottomGridPaneElements();
 
 
@@ -97,8 +103,39 @@ public class WAManager extends Application {
 
     }
 
+    private void initShopAndScalesBottomPane() {
+        shopAndScalesBottomPane = new GridPane();
+        shopAndScalesBottomPane.setPadding(new Insets(5, 5, 5, 5));
+        shopAndScalesBottomPane.setStyle("-fx-border-color: gray");
+        initShopAndScalesBottomPaneConstraints();
+        shopAndScalesBottomPane.add(shopLabel, 0, 0);
+        shopAndScalesBottomPane.add(shopDescriptionLabel, 1, 0);
+        shopAndScalesBottomPane.add(splitter, 2, 0);
+        shopAndScalesBottomPane.add(scalesLabel, 3, 0);
+        shopAndScalesBottomPane.add(scalesDescriptionLabel, 4, 0);
+    }
+
+    private void initShopAndScalesBottomPaneConstraints() {
+        ColumnConstraints shopLabelConstraints = new ColumnConstraints(60);
+
+        ColumnConstraints shopLabelDescriptionConstraints = new ColumnConstraints(150, 200, 200);
+
+        ColumnConstraints splitterConstraints = new ColumnConstraints(0, 0, Double.MAX_VALUE);
+        splitterConstraints.setHgrow(Priority.ALWAYS);
+
+        ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
+
+        ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
+
+        shopAndScalesBottomPane.getColumnConstraints().addAll(shopLabelConstraints,
+                shopLabelDescriptionConstraints, splitterConstraints,
+                scalesLabelConstraints, scalesDescriptionLabelConstraints);
+    }
+
     private void initScalesDescriptionLabel() {
         scalesDescriptionLabel = new Label();
+        // TODO: replace hardcode with implementation
+        scalesDescriptionLabel.setText(" Aclas LB1.25 @ Onego Labs via OLE driver (TCP/IP)");
     }
 
     private void initScalesLabel() {
@@ -107,6 +144,8 @@ public class WAManager extends Application {
 
     private void initShopDescriptionLabel() {
         shopDescriptionLabel = new Label();
+        // TODO: replace hardcode with implementation
+        shopDescriptionLabel.setText("Narvskaya 96, Saint-Petersburg");
     }
 
     private void initShopLabel() {
@@ -116,9 +155,9 @@ public class WAManager extends Application {
 
     private void initBottomGridPaneElements() {
         initBottomGridPaneconstraints();
-
         bottomGridPane.add(shortArticleDescription, 0, 0);
         bottomGridPane.add(fullArticleDescription, 0, 1);
+        bottomGridPane.add(shopAndScalesBottomPane, 0, 2);
     }
 
     private void initBottomGridPaneconstraints() {
@@ -163,17 +202,16 @@ public class WAManager extends Application {
     }
 
     private void initArticlesCountLabel() {
+        // TODO: replace hardcode with implementation
         articlesCountLabel = new Label("666");
         articlesCountLabel.setGraphicTextGap(3);
         articlesCountLabel.setStyle("-fx-font-weight: bold");
-        articlesCountLabel.setMaxWidth(30);
-        articlesCountLabel.setMinSize(30, 25);
+        articlesCountLabel.setPadding(new Insets(0, 0, 0, 8));
     }
 
     private void initArticlesCountInfoLabel() {
         articlesCountInfoLabel = new Label(Messages.getString("amountInfoLabel"));
         articlesCountInfoLabel.setGraphicTextGap(3);
-        articlesCountInfoLabel.setMinSize(100, 25);
     }
 
     private void initQuickSearchField() {
@@ -192,7 +230,6 @@ public class WAManager extends Application {
         bottomSearchAndInfoPane.minWidthProperty().bind(window.getScene().widthProperty());
         bottomSearchAndInfoPane.setPadding(new Insets(5, 5, 5, 5));
         initBottomSearchAndInfoGridPaneConstraints();
-       // bottomSearchAndInfoPane.setGridLinesVisible(true);
         bottomSearchAndInfoPane.add(quickSearchLabel, 0, 0);
         bottomSearchAndInfoPane.add(quickSearchField, 1, 0);
         bottomGridPane.add(splitter, 2, 0);
@@ -266,7 +303,6 @@ public class WAManager extends Application {
     private void updateInformation(TempData t1) {
         fullArticleDescription.setText(t1.toString());
         shortArticleDescription.setText(t1.getName());
-
     }
 
     private void initExitButton() {
