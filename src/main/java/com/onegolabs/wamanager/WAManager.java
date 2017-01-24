@@ -8,343 +8,467 @@ import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author dmzhg
  */
 public class WAManager extends Application {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WAManager.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WAManager.class);
 
-    private Button refresh;
-    private SplitPane mainSplitPane;
-    private BorderPane topBorderPane;
-    private HBox topButtonBox;
-    private GridPane bottomGridPane;
-    private Button upload;
-    private Stage window;
-    private Button exit;
-    private TableView<TempData> articlesTable;
-    private Configuration settings;
-    private GridPane bottomSearchAndInfoPane;
-    private Label quickSearchLabel;
-    private TextField quickSearchField;
-    private Label articlesCountInfoLabel;
-    private Label articlesCountLabel;
-    private Label shortArticleDescription;
-    private TextArea fullArticleDescription;
-    private Label splitter;
-    private Label shopLabel;
-    private Label shopDescriptionLabel;
-    private Label scalesLabel;
-    private Label scalesDescriptionLabel;
-    private GridPane shopAndScalesBottomPane;
-    private Label validUntilLabel;
-    private Label validUntilField;
+	private Button refresh;
+	private SplitPane mainSplitPane;
+	private BorderPane topBorderPane;
+	private HBox topButtonBox;
+	private GridPane bottomGridPane;
+	private Button upload;
+	private Stage window;
+	private Button exit;
+	private TableView<TempData> articlesTable;
+	private Configuration settings;
+	private GridPane bottomSearchAndInfoPane;
+	private Label quickSearchLabel;
+	private TextField quickSearchField;
+	private Label articlesCountInfoLabel;
+	private Label articlesCountLabel;
+	private Label shortArticleDescription;
+	private TextArea fullArticleDescription;
+	private Label splitter;
+	private Label shopLabel;
+	private Label shopDescriptionLabel;
+	private Label scalesLabel;
+	private Label scalesDescriptionLabel;
+	private GridPane shopAndScalesBottomPane;
+	private Label validUntilLabel;
+	private DatePicker validUntilDatePicker;
+	private Label unpackingDateLabel;
+	private TextField unpackingDateField;
+	private Label mfrExpiryDateLabel;
+	private TextField mfrExpiryDateField;
+	private GridPane bottomExpiryDatesPane;
 
-    public static void main(String[] args) {
-        LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
-    }
+	public static void main(String[] args) {
+		LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
+	}
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        settings = MyPreLoader.getConfiguration();
-        window = primaryStage;
-        initGUI();
-        window.show();
-    }
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		settings = MyPreLoader.getConfiguration();
+		window = primaryStage;
+		initGUI();
+		window.show();
+	}
 
-    private void initGUI() {
-        LOGGER.info("Initializing GUI...");
-        initRefreshButton();
-        initUploadButton();
-        initExitButton();
-        initArticlesTable();
-        initPrimaryStage();
-        initTopButtonBox();
-        initTopBorderPane();
-        initBottomGridPane();
-        initMainSplitPane();
-        initMainWindow();
-        initQuickSearchLabel();
-        initQuickSearchField();
-        initSplitter();
-        initArticlesCountInfoLabel();
-        initArticlesCountLabel();
-        initBottomSearchAndInfoPane();
-        topBorderPane.setBottom(bottomSearchAndInfoPane);
-        topBorderPane.minWidthProperty().bind(window.getScene().widthProperty());
-        bottomGridPane.minWidthProperty().bind(window.getScene().widthProperty());
+	private void initGUI() {
+		LOGGER.info("Initializing GUI...");
+		initRefreshButton();
+		initUploadButton();
+		initExitButton();
+		initArticlesTable();
+		initPrimaryStage();
+		initTopButtonBox();
+		initTopBorderPane();
+		initBottomGridPane();
+		initMainSplitPane();
+		initMainWindow();
+		initQuickSearchLabel();
+		initQuickSearchField();
+		initSplitter();
+		initArticlesCountInfoLabel();
+		initArticlesCountLabel();
+		initBottomSearchAndInfoPane();
+		topBorderPane.setBottom(bottomSearchAndInfoPane);
+		topBorderPane.minWidthProperty().bind(window.getScene().widthProperty());
+		bottomGridPane.minWidthProperty().bind(window.getScene().widthProperty());
 
-        //LOWER PANEL
-        initShoreArticleDescriptionLabel();
-        initFullArticleDescriptionArea();
-        initShopLabel();
-        initShopDescriptionLabel();
-        initScalesLabel();
-        initScalesDescriptionLabel();
-        initShopAndScalesBottomPane();
-        initBottomGridPaneElements();
+		//LOWER PANEL
+		initShoreArticleDescriptionLabel();
+		initFullArticleDescriptionArea();
+		initShopLabel();
+		initShopDescriptionLabel();
+		initScalesLabel();
+		initScalesDescriptionLabel();
+		initShopAndScalesBottomPane();
+		initValidUntilLabel();
+		initValidUntilField();
 
 
-        bottomGridPane.add(new HBox(), 0, 2);
-        bottomGridPane.add(new HBox(), 0, 2);
+		initBottomExpiryDatesPane();
+		initBottomGridPaneElements();
 
-    }
+	}
 
-    private void initShopAndScalesBottomPane() {
-        shopAndScalesBottomPane = new GridPane();
-        shopAndScalesBottomPane.setPadding(new Insets(5, 5, 5, 5));
-        shopAndScalesBottomPane.setStyle("-fx-border-color: gray");
-        initShopAndScalesBottomPaneConstraints();
-        shopAndScalesBottomPane.add(shopLabel, 0, 0);
-        shopAndScalesBottomPane.add(shopDescriptionLabel, 1, 0);
-        shopAndScalesBottomPane.add(splitter, 2, 0);
-        shopAndScalesBottomPane.add(scalesLabel, 3, 0);
-        shopAndScalesBottomPane.add(scalesDescriptionLabel, 4, 0);
-    }
+	private void initBottomExpiryDatesPane() {
+		bottomExpiryDatesPane = new GridPane();
+		initBottomExpiryDatesPaneConstraints();
+		bottomExpiryDatesPane.add(validUntilLabel, 0, 0);
+		bottomExpiryDatesPane.add(validUntilDatePicker, 1, 0);
+	}
 
-    private void initShopAndScalesBottomPaneConstraints() {
-        ColumnConstraints shopLabelConstraints = new ColumnConstraints(60);
+	private void initBottomExpiryDatesPaneConstraints() {
+		ColumnConstraints validUntilLabelConstraints = new ColumnConstraints(60);
 
-        ColumnConstraints shopLabelDescriptionConstraints = new ColumnConstraints(150, 200, 200);
+		ColumnConstraints validUntilFieldConstraints = new ColumnConstraints(110);
 
-        ColumnConstraints splitterConstraints = new ColumnConstraints(0, 0, Double.MAX_VALUE);
-        splitterConstraints.setHgrow(Priority.ALWAYS);
+		ColumnConstraints splitterConstraints = new ColumnConstraints(0, 0, Double.MAX_VALUE);
+		splitterConstraints.setHgrow(Priority.ALWAYS);
 
-        ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
+		ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
 
-        ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
+		ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
 
-        shopAndScalesBottomPane.getColumnConstraints().addAll(shopLabelConstraints,
-                shopLabelDescriptionConstraints, splitterConstraints,
-                scalesLabelConstraints, scalesDescriptionLabelConstraints);
-    }
+		bottomExpiryDatesPane.getColumnConstraints().addAll(validUntilLabelConstraints,
+				validUntilFieldConstraints,
+				splitterConstraints,
+				scalesLabelConstraints,
+				scalesDescriptionLabelConstraints);
+	}
 
-    private void initScalesDescriptionLabel() {
-        scalesDescriptionLabel = new Label();
-        // TODO: replace hardcode with implementation
-        scalesDescriptionLabel.setText(" Aclas LB1.25 @ Onego Labs via OLE driver (TCP/IP)");
-    }
+	private void initValidUntilField() {
+		validUntilDatePicker = new DatePicker();
+		validUntilDatePicker.setPromptText(Messages.getString("datePlaceholder"));
+		validUntilDatePicker.setConverter(new StringConverter<LocalDate>() {
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    private void initScalesLabel() {
-        scalesLabel = new Label(Messages.getString("scales"));
-    }
+			@Override
+			public String toString(LocalDate localDate) {
+				if (localDate != null) {
+					return dateFormatter.format(localDate);
+				} else {
+					return "";
+				}
+			}
 
-    private void initShopDescriptionLabel() {
-        shopDescriptionLabel = new Label();
-        // TODO: replace hardcode with implementation
-        shopDescriptionLabel.setText("Narvskaya 96, Saint-Petersburg");
-    }
+			@Override
+			public LocalDate fromString(String s) {
+				if (s == null || s.isEmpty()) {
+					return null;
+				}
+				return LocalDate.parse(s, dateFormatter);
+			}
+		});
 
-    private void initShopLabel() {
-        shopLabel = new Label(Messages.getString("shop"));
+		validUntilDatePicker.getEditor().setOnKeyTyped(keyEvent -> {
+			char c = keyEvent.getCharacter().charAt(0);
+			if (!(Character
+					.isDigit(c)) || (c == java.awt.event.KeyEvent.VK_BACK_SPACE) || c == java.awt.event.KeyEvent.VK_DELETE) {
+				keyEvent.consume();
+			}
+		});
+//		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+//		DateStringConverter converter = new DateStringConverter(dateFormat);
+//		//то же самое с lambda expression
+//		TextFormatter<Date> formatter = new TextFormatter<>(c -> {
+//			String text = c.getText();
+//			for (int i = 0; i < text.length(); i++)
+//				if (!Character.isDigit(text.charAt(i)))
+//					return null;
+//
+//			if (c.isContentChange()) {
+//				// auto parse
+//				if (c.getControlNewText().length() >= 10) {
+//					try {
+//						dateFormat.parse(c.getControlNewText());
+//					} catch (ParseException ex) {
+//						c.getControl().setStyle("-fx-background-color: red;");
+//					}
+//				} else {
+//					c.getControl().setStyle(null);
+//				}
+//			}
+//			if (c.isAdded()) {
+//				// length restriction
+//				if (c.getControlNewText().length() > 10) {
+//					return null;
+//				}
+//
+//				// auto mask
+//				int caretPosition = c.getCaretPosition();
+//				if (caretPosition == 2 || caretPosition == 5) {
+//					c.setText(c.getText() + ".");
+//					c.setCaretPosition(c.getControlNewText().length());
+//					c.setAnchor(c.getControlNewText().length());
+//				}
+//			}
+//			return c;
+//		});
+//
+//		//ограничение на ввод кол-ва символов (например, не более 7)
+//
+	}
 
-    }
+	private void initValidUntilLabel() {
+		validUntilLabel = new Label(Messages.getString("validUntil"));
+	}
 
-    private void initBottomGridPaneElements() {
-        initBottomGridPaneconstraints();
-        bottomGridPane.add(shortArticleDescription, 0, 0);
-        bottomGridPane.add(fullArticleDescription, 0, 1);
-        bottomGridPane.add(shopAndScalesBottomPane, 0, 2);
-    }
+	private void initShopAndScalesBottomPane() {
+		shopAndScalesBottomPane = new GridPane();
+		shopAndScalesBottomPane.setPadding(new Insets(5, 5, 5, 5));
+		shopAndScalesBottomPane.setStyle("-fx-border-color: gray");
+		initShopAndScalesBottomPaneConstraints();
+		shopAndScalesBottomPane.add(shopLabel, 0, 0);
+		shopAndScalesBottomPane.add(shopDescriptionLabel, 1, 0);
+		shopAndScalesBottomPane.add(splitter, 2, 0);
+		shopAndScalesBottomPane.add(scalesLabel, 3, 0);
+		shopAndScalesBottomPane.add(scalesDescriptionLabel, 4, 0);
+	}
 
-    private void initBottomGridPaneconstraints() {
-        ColumnConstraints shortArticleDescriptionConstraints = new ColumnConstraints();
-        shortArticleDescriptionConstraints.setHgrow(Priority.ALWAYS);
-        ColumnConstraints fullArticleDescriptionConstraints = new ColumnConstraints();
-        bottomGridPane.getColumnConstraints().addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
+	private void initShopAndScalesBottomPaneConstraints() {
+		ColumnConstraints shopLabelConstraints = new ColumnConstraints(60);
 
-    }
+		ColumnConstraints shopLabelDescriptionConstraints = new ColumnConstraints(150, 200, 200);
 
-    private void initSplitter() {
-        splitter = new Label();
-    }
+		ColumnConstraints splitterConstraints = new ColumnConstraints(0, 0, Double.MAX_VALUE);
+		splitterConstraints.setHgrow(Priority.ALWAYS);
 
-    private void initFullArticleDescriptionArea() {
-        fullArticleDescription = new TextArea();
-        fullArticleDescription.setMaxWidth(Double.POSITIVE_INFINITY);
-    }
+		ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
 
-    private void initShoreArticleDescriptionLabel() {
-        shortArticleDescription = new Label(Messages.getString("selectedArticleShortDesc"));
-        shortArticleDescription.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
-        shortArticleDescription.setPadding(new Insets(0, 5, 5, 5));
-    }
+		ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
 
-    private void initBottomSearchAndInfoGridPaneConstraints() {
-        ColumnConstraints quickSearchLabelConstraints = new ColumnConstraints(100);
+		shopAndScalesBottomPane.getColumnConstraints().addAll(shopLabelConstraints,
+				shopLabelDescriptionConstraints,
+				splitterConstraints,
+				scalesLabelConstraints,
+				scalesDescriptionLabelConstraints);
+	}
 
-        ColumnConstraints quickSearchFieldConstraints = new ColumnConstraints(130);
+	private void initScalesDescriptionLabel() {
+		scalesDescriptionLabel = new Label();
+		// TODO: replace hardcode with implementation
+		scalesDescriptionLabel.setText(" Aclas LB1.25 @ Onego Labs via OLE driver (TCP/IP)");
+	}
 
-        ColumnConstraints splitterConstraints = new ColumnConstraints(100, 100, Double.MAX_VALUE);
-        splitterConstraints.setHgrow(Priority.ALWAYS);
+	private void initScalesLabel() {
+		scalesLabel = new Label(Messages.getString("scales"));
+	}
 
-        ColumnConstraints articlesCountInfoLabelConstraints = new ColumnConstraints(100);
+	private void initShopDescriptionLabel() {
+		shopDescriptionLabel = new Label();
+		// TODO: replace hardcode with implementation
+		shopDescriptionLabel.setText("Narvskaya 96, Saint-Petersburg");
+	}
 
-        ColumnConstraints articlesCountLabelConstraints = new ColumnConstraints(50);
-        articlesCountInfoLabelConstraints.setHalignment(HPos.RIGHT);
+	private void initShopLabel() {
+		shopLabel = new Label(Messages.getString("shop"));
 
-        bottomSearchAndInfoPane.getColumnConstraints().addAll(quickSearchLabelConstraints,
-                quickSearchFieldConstraints, splitterConstraints,
-                articlesCountInfoLabelConstraints, articlesCountLabelConstraints);
-    }
+	}
 
-    private void initArticlesCountLabel() {
-        // TODO: replace hardcode with implementation
-        articlesCountLabel = new Label("666");
-        articlesCountLabel.setGraphicTextGap(3);
-        articlesCountLabel.setStyle("-fx-font-weight: bold");
-        articlesCountLabel.setPadding(new Insets(0, 0, 0, 8));
-    }
+	private void initBottomGridPaneElements() {
+		initBottomGridPaneConstraints();
+		bottomGridPane.add(shortArticleDescription, 0, 0);
+		bottomGridPane.add(fullArticleDescription, 0, 1);
+		bottomGridPane.add(bottomExpiryDatesPane, 0, 2);
+		bottomGridPane.add(shopAndScalesBottomPane, 0, 3);
+	}
 
-    private void initArticlesCountInfoLabel() {
-        articlesCountInfoLabel = new Label(Messages.getString("amountInfoLabel"));
-        articlesCountInfoLabel.setGraphicTextGap(3);
-    }
+	private void initBottomGridPaneConstraints() {
+		ColumnConstraints shortArticleDescriptionConstraints = new ColumnConstraints();
+		shortArticleDescriptionConstraints.setHgrow(Priority.ALWAYS);
+		RowConstraints shortArticleDescriptionRowConstraints = new RowConstraints();
 
-    private void initQuickSearchField() {
-        quickSearchField = new TextField();
-        quickSearchField.setPromptText(Messages.getString("enterArticleCode"));
-    }
+		ColumnConstraints fullArticleDescriptionConstraints = new ColumnConstraints();
+		RowConstraints fullArticleDescriptionRowConstraints = new RowConstraints();
+		fullArticleDescriptionRowConstraints.setVgrow(Priority.ALWAYS);
 
-    private void initQuickSearchLabel() {
-        quickSearchLabel = new Label(Messages.getString("quickSearchLabel"));
-        quickSearchLabel.setGraphicTextGap(3);
-    }
+		bottomGridPane.getColumnConstraints()
+					  .addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
+		bottomGridPane.getRowConstraints().add(0, shortArticleDescriptionRowConstraints);
+		bottomGridPane.getRowConstraints().add(1, fullArticleDescriptionRowConstraints);
 
-    private void initBottomSearchAndInfoPane() {
-        bottomSearchAndInfoPane = new GridPane();
-        bottomSearchAndInfoPane.setMaxHeight(25);
-        bottomSearchAndInfoPane.minWidthProperty().bind(window.getScene().widthProperty());
-        bottomSearchAndInfoPane.setPadding(new Insets(5, 5, 5, 5));
-        initBottomSearchAndInfoGridPaneConstraints();
-        bottomSearchAndInfoPane.add(quickSearchLabel, 0, 0);
-        bottomSearchAndInfoPane.add(quickSearchField, 1, 0);
-        bottomGridPane.add(splitter, 2, 0);
-        bottomSearchAndInfoPane.add(articlesCountInfoLabel, 3, 0);
-        bottomSearchAndInfoPane.add(articlesCountLabel, 4, 0);
-    }
+	}
 
-    private void initMainWindow() {
-        Scene scene = new Scene(mainSplitPane);
-        window.setMinWidth(640);
-        window.setMinHeight(480);
-        window.setMaximized(true);
-        window.setScene(scene);
-    }
+	private void initSplitter() {
+		splitter = new Label();
+	}
 
-    private void initMainSplitPane() {
-        mainSplitPane = new SplitPane(topBorderPane, bottomGridPane);
-        mainSplitPane.setOrientation(Orientation.VERTICAL);
-        mainSplitPane.setDividerPositions(0.75f);
-    }
+	private void initFullArticleDescriptionArea() {
+		fullArticleDescription = new TextArea();
+	}
 
-    private void initBottomGridPane() {
-        bottomGridPane = new GridPane();
-        bottomGridPane.setPadding(new Insets(5, 5, 5, 5));
-    }
+	private void initShoreArticleDescriptionLabel() {
+		shortArticleDescription = new Label(Messages.getString("selectedArticleShortDesc"));
+		shortArticleDescription.setStyle("-fx-font-weight: bold; -fx-font-size: 20");
+		shortArticleDescription.setPadding(new Insets(0, 5, 5, 5));
+	}
 
-    private void initTopButtonBox() {
-        topButtonBox = new HBox();
-        topButtonBox.setSpacing(5);
-        topButtonBox.setPadding(new Insets(5, 5, 5, 5));
-        topButtonBox.getChildren().addAll(refresh, upload, exit);
-    }
+	private void initBottomSearchAndInfoGridPaneConstraints() {
+		ColumnConstraints quickSearchLabelConstraints = new ColumnConstraints(100);
 
-    private void initTopBorderPane() {
-        topBorderPane = new BorderPane();
-        topBorderPane.setTop(topButtonBox);
-        topBorderPane.setLeft(new Label());
-        topBorderPane.setCenter(articlesTable);
-    }
+		ColumnConstraints quickSearchFieldConstraints = new ColumnConstraints(130);
 
-    private void initPrimaryStage() {
-        window.getIcons().add(new Image(getClass().getResourceAsStream("/icons/app_icon.png"), 300, 300, false, false));
-        window.setTitle(Messages.getString("title"));
-    }
+		ColumnConstraints splitterConstraints = new ColumnConstraints(100, 100, Double.MAX_VALUE);
+		splitterConstraints.setHgrow(Priority.ALWAYS);
 
-    private void initArticlesTable() {
-        articlesTable = new TableView<>();
-        TableColumn<TempData, String> code = new TableColumn<>(Messages.getString("code"));
-        TableColumn<TempData, String> name = new TableColumn<>(Messages.getString("name"));
-        TableColumn<TempData, String> description = new TableColumn<>(Messages.getString("description"));
+		ColumnConstraints articlesCountInfoLabelConstraints = new ColumnConstraints(100);
 
-        code.setCellValueFactory(new PropertyValueFactory<>("code"));
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+		ColumnConstraints articlesCountLabelConstraints = new ColumnConstraints(50);
+		articlesCountInfoLabelConstraints.setHalignment(HPos.RIGHT);
 
-        description.setCellValueFactory(new PropertyValueFactory<>("description"));
-        ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First", "Description 1"));
+		bottomSearchAndInfoPane.getColumnConstraints().addAll(quickSearchLabelConstraints,
+				quickSearchFieldConstraints,
+				splitterConstraints,
+				articlesCountInfoLabelConstraints,
+				articlesCountLabelConstraints);
+	}
 
-        data.add(new TempData(2, "Second", "Description 2"));
-        data.add(new TempData(3, "Third", "Description 3"));
-        data.add(new TempData(4, "Fourth", "Description 4"));
-        articlesTable.getColumns().addAll(code, name, description);
-        articlesTable.setItems(data);
-        articlesTable.setVisible(true);
-        articlesTable.setEditable(false);
-        articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, tempData, t1) -> {
-            LOGGER.info(t1.toString());
-            updateInformation(t1);
-        });
-    }
+	private void initArticlesCountLabel() {
+		// TODO: replace hardcode with implementation
+		articlesCountLabel = new Label("666");
+		articlesCountLabel.setGraphicTextGap(3);
+		articlesCountLabel.setStyle("-fx-font-weight: bold");
+		articlesCountLabel.setPadding(new Insets(0, 0, 0, 8));
+	}
 
-    private void updateInformation(TempData t1) {
-        fullArticleDescription.setText(t1.toString());
-        shortArticleDescription.setText(t1.getName());
-    }
+	private void initArticlesCountInfoLabel() {
+		articlesCountInfoLabel = new Label(Messages.getString("amountInfoLabel"));
+		articlesCountInfoLabel.setGraphicTextGap(3);
+	}
 
-    private void initExitButton() {
-        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/exit.png"),
-                30,
-                30,
-                true,
-                true));
-        exit = new Button(Messages.getString("exit"), icon);
-        exit.setContentDisplay(ContentDisplay.TOP);
-        exit.setText(Messages.getString("exit"));
-        exit.setMinHeight(60);
-        exit.setMinWidth(60);
-        exit.setOnAction(e -> {
-            System.out.println("Exit happened!");
-            window.close();
-        });
-    }
+	private void initQuickSearchField() {
+		quickSearchField = new TextField();
+		quickSearchField.setPromptText(Messages.getString("enterArticleCode"));
+	}
 
-    private void initRefreshButton() {
-        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/refresh.png"),
-                30,
-                30,
-                true,
-                true));
-        refresh = new Button(Messages.getString("refresh"), icon);
-        refresh.setContentDisplay(ContentDisplay.TOP);
-        refresh.setMinHeight(60);
-        refresh.setMinWidth(60);
-        refresh.setOnAction(e -> System.out.println("Refresh happened!"));
-    }
+	private void initQuickSearchLabel() {
+		quickSearchLabel = new Label(Messages.getString("quickSearchLabel"));
+		quickSearchLabel.setGraphicTextGap(3);
+	}
 
-    private void initUploadButton() {
-        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/upload.png"),
-                30,
-                30,
-                true,
-                true));
-        upload = new Button(Messages.getString("upload"), icon);
-        upload.setContentDisplay(ContentDisplay.TOP);
-        upload.setMinHeight(60);
-        upload.setMinWidth(60);
-        upload.setOnAction(e -> System.out.println("Upload happened!"));
-    }
+	private void initBottomSearchAndInfoPane() {
+		bottomSearchAndInfoPane = new GridPane();
+		bottomSearchAndInfoPane.setMaxHeight(25);
+		bottomSearchAndInfoPane.minWidthProperty().bind(window.getScene().widthProperty());
+		bottomSearchAndInfoPane.setPadding(new Insets(5, 5, 5, 5));
+		initBottomSearchAndInfoGridPaneConstraints();
+		bottomSearchAndInfoPane.add(quickSearchLabel, 0, 0);
+		bottomSearchAndInfoPane.add(quickSearchField, 1, 0);
+		bottomSearchAndInfoPane.add(splitter, 2, 0);
+		bottomSearchAndInfoPane.add(articlesCountInfoLabel, 3, 0);
+		bottomSearchAndInfoPane.add(articlesCountLabel, 4, 0);
+	}
+
+	private void initMainWindow() {
+		Scene scene = new Scene(mainSplitPane);
+		window.setMinWidth(640);
+		window.setMinHeight(480);
+		window.setMaximized(true);
+		window.setScene(scene);
+	}
+
+	private void initMainSplitPane() {
+		mainSplitPane = new SplitPane(topBorderPane, bottomGridPane);
+		mainSplitPane.setOrientation(Orientation.VERTICAL);
+		mainSplitPane.setDividerPositions(0.75f);
+	}
+
+	private void initBottomGridPane() {
+		bottomGridPane = new GridPane();
+		bottomGridPane.setPadding(new Insets(5, 5, 5, 5));
+		bottomGridPane.setVgap(5);
+	}
+
+	private void initTopButtonBox() {
+		topButtonBox = new HBox();
+		topButtonBox.setSpacing(5);
+		topButtonBox.setPadding(new Insets(5, 5, 5, 5));
+		topButtonBox.getChildren().addAll(refresh, upload, exit);
+	}
+
+	private void initTopBorderPane() {
+		topBorderPane = new BorderPane();
+		topBorderPane.setTop(topButtonBox);
+		topBorderPane.setLeft(new Label());
+		topBorderPane.setCenter(articlesTable);
+	}
+
+	private void initPrimaryStage() {
+		window.getIcons().add(new Image(getClass().getResourceAsStream("/icons/app_icon.png"), 300, 300, false, false));
+		window.setTitle(Messages.getString("title"));
+	}
+
+	private void initArticlesTable() {
+		articlesTable = new TableView<>();
+		TableColumn<TempData, String> code = new TableColumn<>(Messages.getString("code"));
+		TableColumn<TempData, String> name = new TableColumn<>(Messages.getString("name"));
+		TableColumn<TempData, String> description = new TableColumn<>(Messages.getString("description"));
+
+		code.setCellValueFactory(new PropertyValueFactory<>("code"));
+		name.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+		description.setCellValueFactory(new PropertyValueFactory<>("description"));
+		ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First", "Description 1"));
+
+		data.add(new TempData(2, "Second", "Description 2"));
+		data.add(new TempData(3, "Third", "Description 3"));
+		data.add(new TempData(4, "Fourth", "Description 4"));
+		articlesTable.getColumns().addAll(code, name, description);
+		articlesTable.setItems(data);
+		articlesTable.setVisible(true);
+		articlesTable.setEditable(false);
+		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, tempData, t1) -> {
+			LOGGER.info(t1.toString());
+			updateInformation(t1);
+		});
+	}
+
+	private void updateInformation(TempData t1) {
+		fullArticleDescription.setText(t1.toString());
+		shortArticleDescription.setText(t1.getName());
+	}
+
+	private void initExitButton() {
+		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/exit.png"),
+				30,
+				30,
+				true,
+				true));
+		exit = new Button(Messages.getString("exit"), icon);
+		exit.setContentDisplay(ContentDisplay.TOP);
+		exit.setText(Messages.getString("exit"));
+		exit.setMinHeight(60);
+		exit.setMinWidth(60);
+		exit.setOnAction(e -> {
+			System.out.println("Exit happened!");
+			window.close();
+		});
+	}
+
+	private void initRefreshButton() {
+		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/refresh.png"),
+				30,
+				30,
+				true,
+				true));
+		refresh = new Button(Messages.getString("refresh"), icon);
+		refresh.setContentDisplay(ContentDisplay.TOP);
+		refresh.setMinHeight(60);
+		refresh.setMinWidth(60);
+		refresh.setOnAction(e -> System.out.println("Refresh happened!"));
+	}
+
+	private void initUploadButton() {
+		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/upload.png"),
+				30,
+				30,
+				true,
+				true));
+		upload = new Button(Messages.getString("upload"), icon);
+		upload.setContentDisplay(ContentDisplay.TOP);
+		upload.setMinHeight(60);
+		upload.setMinWidth(60);
+		upload.setOnAction(e -> System.out.println("Upload happened!"));
+	}
 }
