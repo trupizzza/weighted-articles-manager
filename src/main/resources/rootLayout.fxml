@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<SplitPane dividerPositions="0.7" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane dividerPositions="0.7" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <items>
       <BorderPane>
          <top>
@@ -48,13 +48,13 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                   <MaskField mask="+7(DDD)DDD-DDDD"/>
+                   <MaskField mask="+7(DDD)DDD-DDDD" />
                   <Label text="Label">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField maxWidth="130.0" minHeight="20.0" prefHeight="25.0" prefWidth="70.0" GridPane.columnIndex="1" />
+                  <TextField maxWidth="130.0" minHeight="20.0" prefHeight="25.0" prefWidth="70.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                   <Label prefHeight="17.0" prefWidth="25.0" text="Label" GridPane.columnIndex="3" />
                   <Label text="Label" GridPane.columnIndex="4" />
                </children>
