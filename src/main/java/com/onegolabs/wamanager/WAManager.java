@@ -1,5 +1,6 @@
 package com.onegolabs.wamanager;
 
+import com.onegolabs.SimpleService;
 import com.onegolabs.wamanager.model.TempData;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
@@ -15,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,12 +105,18 @@ public class WAManager extends Application {
 		initScalesDescriptionLabel();
 		initShopAndScalesBottomPane();
 		initValidUntilLabel();
-		initValidUntilField();
+		initValidUntilDatePicker();
+		initUnpackingDateLabel();
 
 
 		initBottomExpiryDatesPane();
 		initBottomGridPaneElements();
 
+	}
+
+	private void initUnpackingDateLabel() {
+		unpackingDateLabel = new Label(Messages.getString("unpackingLabel"));
+		unpackingDateLabel.setVisible(false);
 	}
 
 	private void initBottomExpiryDatesPane() {
@@ -137,11 +145,12 @@ public class WAManager extends Application {
 				scalesDescriptionLabelConstraints);
 	}
 
-	private void initValidUntilField() {
+	private void initValidUntilDatePicker() {
 		validUntilDatePicker = new DatePicker();
+		validUntilDatePicker.setEditable(false);
 		validUntilDatePicker.setPromptText(Messages.getString("datePlaceholder"));
 		validUntilDatePicker.setConverter(new StringConverter<LocalDate>() {
-			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 			@Override
 			public String toString(LocalDate localDate) {
@@ -161,53 +170,25 @@ public class WAManager extends Application {
 			}
 		});
 
-		validUntilDatePicker.getEditor().setOnKeyTyped(keyEvent -> {
-			char c = keyEvent.getCharacter().charAt(0);
-			if (!(Character
-					.isDigit(c)) || (c == java.awt.event.KeyEvent.VK_BACK_SPACE) || c == java.awt.event.KeyEvent.VK_DELETE) {
-				keyEvent.consume();
+		final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
+			@Override
+			public DateCell call(final DatePicker datePicker) {
+				return new DateCell() {
+					@Override
+					public void updateItem(LocalDate item, boolean empty) {
+						super.updateItem(item, empty);
+						if (item.isBefore(LocalDate.now())) {
+							setDisable(true);
+							setStyle("-fx-background-color: #EEEEEE;");
+						}
+					}
+				};
 			}
+		};
+		validUntilDatePicker.setDayCellFactory(dayCellFactory);
+		validUntilDatePicker.setOnAction(e -> {
+			LOGGER.info("Date selected: " + validUntilDatePicker.getEditor().getText());
 		});
-//		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-//		DateStringConverter converter = new DateStringConverter(dateFormat);
-//		//то же самое с lambda expression
-//		TextFormatter<Date> formatter = new TextFormatter<>(c -> {
-//			String text = c.getText();
-//			for (int i = 0; i < text.length(); i++)
-//				if (!Character.isDigit(text.charAt(i)))
-//					return null;
-//
-//			if (c.isContentChange()) {
-//				// auto parse
-//				if (c.getControlNewText().length() >= 10) {
-//					try {
-//						dateFormat.parse(c.getControlNewText());
-//					} catch (ParseException ex) {
-//						c.getControl().setStyle("-fx-background-color: red;");
-//					}
-//				} else {
-//					c.getControl().setStyle(null);
-//				}
-//			}
-//			if (c.isAdded()) {
-//				// length restriction
-//				if (c.getControlNewText().length() > 10) {
-//					return null;
-//				}
-//
-//				// auto mask
-//				int caretPosition = c.getCaretPosition();
-//				if (caretPosition == 2 || caretPosition == 5) {
-//					c.setText(c.getText() + ".");
-//					c.setCaretPosition(c.getControlNewText().length());
-//					c.setAnchor(c.getControlNewText().length());
-//				}
-//			}
-//			return c;
-//		});
-//
-//		//ограничение на ввод кол-ва символов (например, не более 7)
-//
 	}
 
 	private void initValidUntilLabel() {
@@ -456,7 +437,14 @@ public class WAManager extends Application {
 		refresh.setContentDisplay(ContentDisplay.TOP);
 		refresh.setMinHeight(60);
 		refresh.setMinWidth(60);
-		refresh.setOnAction(e -> System.out.println("Refresh happened!"));
+		refresh.setOnAction(e -> {
+			LOGGER.info("Refresh happened!");
+			SimpleService service = new SimpleService();
+			ProgressForm progressForm = new ProgressForm();
+			service.setOnSucceeded(event -> progressForm.getDialogStage().close());
+			progressForm.activateProgressBar(service);
+			service.start();
+		});
 	}
 
 	private void initUploadButton() {
