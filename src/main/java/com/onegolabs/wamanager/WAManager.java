@@ -1,16 +1,18 @@
 package com.onegolabs.wamanager;
 
 import com.onegolabs.SimpleService;
-import com.onegolabs.wamanager.model.TempData;
+import com.onegolabs.wamanager.model.Article;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 /**
  * @author dmzhg
@@ -39,7 +42,7 @@ public class WAManager extends Application {
 	private Button upload;
 	private Stage window;
 	private Button exit;
-	private TableView<TempData> articlesTable;
+	private TableView<Article> articlesTable;
 	private Configuration settings;
 	private GridPane bottomSearchAndInfoPane;
 	private Label quickSearchLabel;
@@ -56,19 +59,21 @@ public class WAManager extends Application {
 	private GridPane shopAndScalesBottomPane;
 	private Label validUntilLabel;
 	private DatePicker validUntilDatePicker;
-	private Label unpackingDateLabel;
-	private TextField unpackingDateField;
 	private Label mfrExpiryDateLabel;
-	private TextField mfrExpiryDateField;
+	private DatePicker mfrExpiryDatePicker;
 	private GridPane bottomExpiryDatesPane;
+	private StringConverter<LocalDate> dateConverter;
+	private Callback<DatePicker, DateCell> cellFactory;
+	private ObservableList<Article> data;
+	private ObservableList<Article> filteredData;
 
 	public static void main(String[] args) {
-		LauncherImpl.launchApplication(WAManager.class, MyPreLoader.class, args);
+		LauncherImpl.launchApplication(WAManager.class, WamPreLoader.class, args);
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		settings = MyPreLoader.getConfiguration();
+		settings = WamPreLoader.getConfiguration();
 		window = primaryStage;
 		initGUI();
 		window.show();
@@ -76,9 +81,13 @@ public class WAManager extends Application {
 
 	private void initGUI() {
 		LOGGER.info("Initializing GUI...");
+		initDateConverter();
+		// init cell factory with restriction that you can't pick Date < Now
+		initDateCellFactory();
 		initRefreshButton();
 		initUploadButton();
 		initExitButton();
+		initQuickSearchField();
 		initArticlesTable();
 		initPrimaryStage();
 		initTopButtonBox();
@@ -87,7 +96,6 @@ public class WAManager extends Application {
 		initMainSplitPane();
 		initMainWindow();
 		initQuickSearchLabel();
-		initQuickSearchField();
 		initSplitter();
 		initArticlesCountInfoLabel();
 		initArticlesCountLabel();
@@ -106,50 +114,38 @@ public class WAManager extends Application {
 		initShopAndScalesBottomPane();
 		initValidUntilLabel();
 		initValidUntilDatePicker();
-		initUnpackingDateLabel();
-
+		initMfrExpiryDateLabel();
+		initMfrExpiryDatePicker();
 
 		initBottomExpiryDatesPane();
 		initBottomGridPaneElements();
 
 	}
 
-	private void initUnpackingDateLabel() {
-		unpackingDateLabel = new Label(Messages.getString("unpackingLabel"));
-		unpackingDateLabel.setVisible(false);
+	private void initMfrExpiryDateLabel() {
+		mfrExpiryDateLabel = new Label(Messages.getString("mfrExpiryDate"));
 	}
 
-	private void initBottomExpiryDatesPane() {
-		bottomExpiryDatesPane = new GridPane();
-		initBottomExpiryDatesPaneConstraints();
-		bottomExpiryDatesPane.add(validUntilLabel, 0, 0);
-		bottomExpiryDatesPane.add(validUntilDatePicker, 1, 0);
+	private void initDateCellFactory() {
+		cellFactory = new Callback<DatePicker, DateCell>() {
+			@Override
+			public DateCell call(final DatePicker datePicker) {
+				return new DateCell() {
+					@Override
+					public void updateItem(LocalDate item, boolean empty) {
+						super.updateItem(item, empty);
+						if (item.isBefore(LocalDate.now())) {
+							setDisable(true);
+							setStyle("-fx-background-color: #EEEEEE;");
+						}
+					}
+				};
+			}
+		};
 	}
 
-	private void initBottomExpiryDatesPaneConstraints() {
-		ColumnConstraints validUntilLabelConstraints = new ColumnConstraints(60);
-
-		ColumnConstraints validUntilFieldConstraints = new ColumnConstraints(110);
-
-		ColumnConstraints splitterConstraints = new ColumnConstraints(0, 0, Double.MAX_VALUE);
-		splitterConstraints.setHgrow(Priority.ALWAYS);
-
-		ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
-
-		ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
-
-		bottomExpiryDatesPane.getColumnConstraints().addAll(validUntilLabelConstraints,
-				validUntilFieldConstraints,
-				splitterConstraints,
-				scalesLabelConstraints,
-				scalesDescriptionLabelConstraints);
-	}
-
-	private void initValidUntilDatePicker() {
-		validUntilDatePicker = new DatePicker();
-		validUntilDatePicker.setEditable(false);
-		validUntilDatePicker.setPromptText(Messages.getString("datePlaceholder"));
-		validUntilDatePicker.setConverter(new StringConverter<LocalDate>() {
+	private void initDateConverter() {
+		dateConverter = new StringConverter<LocalDate>() {
 			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 			@Override
@@ -168,26 +164,65 @@ public class WAManager extends Application {
 				}
 				return LocalDate.parse(s, dateFormatter);
 			}
-		});
-
-		final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
-			@Override
-			public DateCell call(final DatePicker datePicker) {
-				return new DateCell() {
-					@Override
-					public void updateItem(LocalDate item, boolean empty) {
-						super.updateItem(item, empty);
-						if (item.isBefore(LocalDate.now())) {
-							setDisable(true);
-							setStyle("-fx-background-color: #EEEEEE;");
-						}
-					}
-				};
-			}
 		};
-		validUntilDatePicker.setDayCellFactory(dayCellFactory);
+	}
+
+	private void initMfrExpiryDatePicker() {
+		mfrExpiryDatePicker = new DatePicker();
+		mfrExpiryDatePicker.setEditable(false);
+		mfrExpiryDatePicker.setPromptText(Messages.getString("datePlaceholder"));
+		mfrExpiryDatePicker.setConverter(dateConverter);
+		mfrExpiryDatePicker.setDayCellFactory(cellFactory);
+		mfrExpiryDatePicker
+				.setOnAction(e -> LOGGER.info("Man. date selected: " + mfrExpiryDatePicker.getEditor().getText()));
+	}
+
+	private void initBottomExpiryDatesPane() {
+		bottomExpiryDatesPane = new GridPane();
+		initBottomExpiryDatesPaneConstraints();
+		bottomExpiryDatesPane.add(validUntilLabel, 0, 0);
+		bottomExpiryDatesPane.add(validUntilDatePicker, 1, 0);
+		bottomExpiryDatesPane.add(mfrExpiryDateLabel, 3, 0);
+		bottomExpiryDatesPane.add(mfrExpiryDatePicker, 4, 0);
+	}
+
+	private void initBottomExpiryDatesPaneConstraints() {
+		ColumnConstraints validUntilLabelConstraints = new ColumnConstraints(60);
+
+		ColumnConstraints validUntilDatePickerConstraints = new ColumnConstraints(110);
+
+		ColumnConstraints smallSplitterConstraints = new ColumnConstraints(10);
+
+		ColumnConstraints mfrExpiryDateFieldConstraints = new ColumnConstraints(180);
+
+		ColumnConstraints mfrExpiryDatePickerConstraints = new ColumnConstraints(110);
+
+		ColumnConstraints splitterConstraints = new ColumnConstraints(0, 0, Double.MAX_VALUE);
+		splitterConstraints.setHgrow(Priority.ALWAYS);
+
+		ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
+
+		ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
+
+		bottomExpiryDatesPane.getColumnConstraints().addAll(validUntilLabelConstraints,
+				validUntilDatePickerConstraints,
+				smallSplitterConstraints,
+				mfrExpiryDateFieldConstraints,
+				mfrExpiryDatePickerConstraints,
+				splitterConstraints,
+				scalesLabelConstraints,
+				scalesDescriptionLabelConstraints);
+	}
+
+	private void initValidUntilDatePicker() {
+		validUntilDatePicker = new DatePicker();
+		validUntilDatePicker.setEditable(false);
+		validUntilDatePicker.setPromptText(Messages.getString("datePlaceholder"));
+		validUntilDatePicker.setConverter(dateConverter);
+		validUntilDatePicker.setDayCellFactory(cellFactory);
 		validUntilDatePicker.setOnAction(e -> {
 			LOGGER.info("Date selected: " + validUntilDatePicker.getEditor().getText());
+			validUntilLabel.setText("Дата вскрытия:");
 		});
 	}
 
@@ -321,6 +356,9 @@ public class WAManager extends Application {
 	private void initQuickSearchField() {
 		quickSearchField = new TextField();
 		quickSearchField.setPromptText(Messages.getString("enterArticleCode"));
+		quickSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+			updateFilteredData();
+		});
 	}
 
 	private void initQuickSearchLabel() {
@@ -382,32 +420,77 @@ public class WAManager extends Application {
 
 	private void initArticlesTable() {
 		articlesTable = new TableView<>();
-		TableColumn<TempData, String> code = new TableColumn<>(Messages.getString("code"));
-		TableColumn<TempData, String> name = new TableColumn<>(Messages.getString("name"));
-		TableColumn<TempData, String> description = new TableColumn<>(Messages.getString("description"));
+		articlesTable.setPlaceholder(new Label(Messages.getString("noContentInTable")));
+		TableColumn<Article, Integer> ID = new TableColumn<>(Messages.getString("column_ID"));
+		TableColumn<Article, String> materialNumber = new TableColumn<>(Messages.getString("column_materialNumber"));
+		TableColumn<Article, String> materialDescription = new TableColumn<>(Messages
+				.getString("column_materialDescription"));
+		TableColumn<Article, Boolean> weighed = new TableColumn<>(Messages.getString("column_weighed"));
+		weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
+																								   .weighedProperty());
+		ID.setCellValueFactory(new PropertyValueFactory<>("ID"));
+		materialNumber.setCellValueFactory(new PropertyValueFactory<>("materialNumber"));
+		materialDescription.setCellValueFactory(new PropertyValueFactory<>("materialDescription"));
+		weighed.setCellValueFactory(new PropertyValueFactory<>("weighed"));
+		weighed.setCellFactory(CheckBoxTableCell.forTableColumn(weighed));
+		data = FXCollections.observableArrayList(new Article(1, "559165", "ArticleDesc", true));
+		data.addListener((ListChangeListener<Article>) change -> updateFilteredData());
 
-		code.setCellValueFactory(new PropertyValueFactory<>("code"));
-		name.setCellValueFactory(new PropertyValueFactory<>("name"));
+		filteredData = FXCollections.observableArrayList();
+		filteredData.addAll(data);
 
-		description.setCellValueFactory(new PropertyValueFactory<>("description"));
-		ObservableList<TempData> data = FXCollections.observableArrayList(new TempData(1, "First", "Description 1"));
-
-		data.add(new TempData(2, "Second", "Description 2"));
-		data.add(new TempData(3, "Third", "Description 3"));
-		data.add(new TempData(4, "Fourth", "Description 4"));
-		articlesTable.getColumns().addAll(code, name, description);
-		articlesTable.setItems(data);
+		articlesTable.getColumns().addAll(ID, materialNumber, materialDescription, weighed);
+		articlesTable.setItems(filteredData);
 		articlesTable.setVisible(true);
 		articlesTable.setEditable(false);
-		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, tempData, t1) -> {
+		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, article, t1) -> {
 			LOGGER.info(t1.toString());
 			updateInformation(t1);
 		});
 	}
 
-	private void updateInformation(TempData t1) {
-		fullArticleDescription.setText(t1.toString());
-		shortArticleDescription.setText(t1.getName());
+	private void updateFilteredData() {
+		filteredData.clear();
+
+		for (Article article : data) {
+			if (matchesFilter(article)) {
+				filteredData.add(article);
+			}
+		}
+
+		// Must re-sort table after items changed
+		reapplyTableSortOrder();
+	}
+
+	/**
+	 * Returns true if the article matches the current filter. Lower/Upper case
+	 * is ignored.
+	 *
+	 * @param article
+	 * @return
+	 */
+	private boolean matchesFilter(Article article) {
+		String filterString = quickSearchField.getText();
+		if (filterString == null || filterString.isEmpty()) {
+			// No filter --> Add all.
+			return true;
+		}
+		String filterLower = filterString.toLowerCase();
+		if (article.getMaterialDescription().toLowerCase().contains(filterLower)) {
+			return true;
+		}
+		return false; // Does not match
+	}
+
+	private void reapplyTableSortOrder() {
+		ArrayList<TableColumn<Article, ?>> sortOrder = new ArrayList<>(articlesTable.getSortOrder());
+		articlesTable.getSortOrder().clear();
+		articlesTable.getSortOrder().addAll(sortOrder);
+	}
+
+	private void updateInformation(Article article) {
+		fullArticleDescription.setText(article.toString());
+		shortArticleDescription.setText(article.getMaterialDescription());
 	}
 
 	private void initExitButton() {
@@ -440,9 +523,9 @@ public class WAManager extends Application {
 		refresh.setOnAction(e -> {
 			LOGGER.info("Refresh happened!");
 			SimpleService service = new SimpleService();
-			ProgressForm progressForm = new ProgressForm();
-			service.setOnSucceeded(event -> progressForm.getDialogStage().close());
-			progressForm.activateProgressBar(service);
+			ProgressView progressView = new ProgressView();
+			service.setOnSucceeded(event -> progressView.getDialogStage().close());
+			progressView.activateProgressBar(service);
 			service.start();
 		});
 	}
