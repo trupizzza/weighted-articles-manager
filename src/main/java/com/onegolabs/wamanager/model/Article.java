@@ -16,19 +16,15 @@ public class Article {
 	private IntegerProperty expiryDaysCount;
 	private StringProperty expiryDate;
 	private IntegerProperty labelIndex;
+	private IntegerProperty uniqueID;
 
 	public Article(
-			int materialNumber,
-			String materialName,
-			String materialDescription,
-			boolean weighed) {
+			int materialNumber, String materialName, String materialDescription, boolean weighed) {
 		this.materialNumber = new SimpleIntegerProperty(materialNumber);
 		this.materialName = new SimpleStringProperty(materialName);
 		this.materialDescription = new SimpleStringProperty(materialDescription);
 		this.weighed = new SimpleBooleanProperty(weighed);
 	}
-
-	private IntegerProperty uniqueID;
 
 	public int getMaterialNumber() {
 		return materialNumber.get();
