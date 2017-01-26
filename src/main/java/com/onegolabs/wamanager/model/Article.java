@@ -7,22 +7,45 @@ import javafx.beans.property.*;
  */
 public class Article {
 
+	public Article(
+			int materialNumber,
+			String name,
+			String description,
+			double price,
+			boolean weighed,
+			int plu,
+			int expiryDaysCount,
+			String expiryDate,
+			int labelId,
+			int id) {
+		this.materialNumber = new SimpleIntegerProperty(materialNumber);
+		this.name = new SimpleStringProperty(name);
+		this.description = new SimpleStringProperty(description);
+		this.price = new SimpleDoubleProperty(price);
+		this.weighed = new SimpleBooleanProperty(weighed);
+		this.plu = new SimpleIntegerProperty(plu);
+		this.expiryDaysCount = new SimpleIntegerProperty(expiryDaysCount);
+		this.expiryDate = new SimpleStringProperty(expiryDate);
+		this.labelId = new SimpleIntegerProperty(labelId);
+		this.id = new SimpleIntegerProperty(id);
+	}
+
 	private IntegerProperty materialNumber;
-	private StringProperty materialName;
-	private StringProperty materialDescription;
-	private DoubleProperty materialPrice;
+	private StringProperty name;
+	private StringProperty description;
+	private DoubleProperty price;
 	private BooleanProperty weighed;
-	private IntegerProperty pluCode;
+	private IntegerProperty plu;
 	private IntegerProperty expiryDaysCount;
 	private StringProperty expiryDate;
-	private IntegerProperty labelIndex;
-	private IntegerProperty uniqueID;
+	private IntegerProperty labelId;
+	private IntegerProperty id;
 
 	public Article(
-			int materialNumber, String materialName, String materialDescription, boolean weighed) {
+			int materialNumber, String name, String description, boolean weighed) {
 		this.materialNumber = new SimpleIntegerProperty(materialNumber);
-		this.materialName = new SimpleStringProperty(materialName);
-		this.materialDescription = new SimpleStringProperty(materialDescription);
+		this.name = new SimpleStringProperty(name);
+		this.description = new SimpleStringProperty(description);
 		this.weighed = new SimpleBooleanProperty(weighed);
 	}
 
@@ -38,40 +61,40 @@ public class Article {
 		return materialNumber;
 	}
 
-	public String getMaterialName() {
-		return materialName.get();
+	public String getName() {
+		return name.get();
 	}
 
-	public void setMaterialName(String materialName) {
-		this.materialName.set(materialName);
+	public void setName(String name) {
+		this.name.set(name);
 	}
 
-	public StringProperty materialNameProperty() {
-		return materialName;
+	public StringProperty nameProperty() {
+		return name;
 	}
 
-	public String getMaterialDescription() {
-		return materialDescription.get();
+	public String getDescription() {
+		return description.get();
 	}
 
-	public void setMaterialDescription(String materialDescription) {
-		this.materialDescription.set(materialDescription);
+	public void setDescription(String description) {
+		this.description.set(description);
 	}
 
-	public StringProperty materialDescriptionProperty() {
-		return materialDescription;
+	public StringProperty descriptionProperty() {
+		return description;
 	}
 
-	public double getMaterialPrice() {
-		return materialPrice.get();
+	public double getPrice() {
+		return price.get();
 	}
 
-	public void setMaterialPrice(double materialPrice) {
-		this.materialPrice.set(materialPrice);
+	public void setPrice(double price) {
+		this.price.set(price);
 	}
 
-	public DoubleProperty materialPriceProperty() {
-		return materialPrice;
+	public DoubleProperty priceProperty() {
+		return price;
 	}
 
 	public boolean getWeighed() {
@@ -86,16 +109,16 @@ public class Article {
 		return weighed;
 	}
 
-	public int getPluCode() {
-		return pluCode.get();
+	public int getPlu() {
+		return plu.get();
 	}
 
-	public void setPluCode(int pluCode) {
-		this.pluCode.set(pluCode);
+	public void setPlu(int plu) {
+		this.plu.set(plu);
 	}
 
-	public IntegerProperty pluCodeProperty() {
-		return pluCode;
+	public IntegerProperty pluProperty() {
+		return plu;
 	}
 
 	public int getExpiryDaysCount() {
@@ -122,27 +145,27 @@ public class Article {
 		return expiryDate;
 	}
 
-	public int getLabelIndex() {
-		return labelIndex.get();
+	public int getLabelId() {
+		return labelId.get();
 	}
 
-	public void setLabelIndex(int labelIndex) {
-		this.labelIndex.set(labelIndex);
+	public void setLabelId(int labelId) {
+		this.labelId.set(labelId);
 	}
 
-	public IntegerProperty labelIndexProperty() {
-		return labelIndex;
+	public IntegerProperty labelIdProperty() {
+		return labelId;
 	}
 
-	public int getUniqueID() {
-		return uniqueID.get();
+	public int getId() {
+		return id.get();
 	}
 
-	public void setUniqueID(int uniqueID) {
-		this.uniqueID.set(uniqueID);
+	public void setId(int id) {
+		this.id.set(id);
 	}
 
-	public IntegerProperty uniqueIDProperty() {
-		return uniqueID;
+	public IntegerProperty idProperty() {
+		return id;
 	}
 }

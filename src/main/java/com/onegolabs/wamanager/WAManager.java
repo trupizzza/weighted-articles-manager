@@ -263,8 +263,7 @@ public class WAManager extends Application {
 
 	private void initScalesDescriptionLabel() {
 		scalesDescriptionLabel = new Label();
-		// TODO: replace hardcode with implementation
-		scalesDescriptionLabel.setText(" Aclas LB1.25 @ Onego Labs via OLE driver (TCP/IP)");
+		scalesDescriptionLabel.setText(settings.getCustom().getProperty("aclas-001.name"));
 	}
 
 	private void initScalesLabel() {
@@ -421,31 +420,85 @@ public class WAManager extends Application {
 	private void initArticlesTable() {
 		articlesTable = new TableView<>();
 		articlesTable.setPlaceholder(new Label(Messages.getString("noContentInTable")));
-		TableColumn<Article, Integer> ID = new TableColumn<>(Messages.getString("column_ID"));
-		TableColumn<Article, String> materialNumber = new TableColumn<>(Messages.getString("column_materialNumber"));
-		TableColumn<Article, String> materialDescription = new TableColumn<>(Messages
+
+		TableColumn<Article, Integer> column_id = new TableColumn<>(Messages.getString("column_ID"));
+		TableColumn<Article, String> column_materialNumber = new TableColumn<>(Messages
+				.getString("column_materialNumber"));
+		TableColumn<Article, String> column_name = new TableColumn<>(Messages.getString("column_name"));
+		TableColumn<Article, String> column_description = new TableColumn<>(Messages
 				.getString("column_materialDescription"));
-		TableColumn<Article, Boolean> weighed = new TableColumn<>(Messages.getString("column_weighed"));
-		weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
-																								   .weighedProperty());
-		ID.setCellValueFactory(new PropertyValueFactory<>("ID"));
-		materialNumber.setCellValueFactory(new PropertyValueFactory<>("materialNumber"));
-		materialDescription.setCellValueFactory(new PropertyValueFactory<>("materialDescription"));
-		weighed.setCellValueFactory(new PropertyValueFactory<>("weighed"));
-		weighed.setCellFactory(CheckBoxTableCell.forTableColumn(weighed));
-		data = FXCollections.observableArrayList(new Article(1, "559165", "ArticleDesc", true));
+		TableColumn<Article, Boolean> column_weighed = new TableColumn<>(Messages.getString("column_weighed"));
+		TableColumn<Article, Double> column_price = new TableColumn<>(Messages.getString("column_price"));
+		TableColumn<Article, Integer> column_plu = new TableColumn<>(Messages.getString("column_plu"));
+		TableColumn<Article, Double> column_labelId = new TableColumn<>(Messages.getString("column_labelId"));
+
+		column_weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
+																										  .weighedProperty());
+		column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
+		column_materialNumber.setCellValueFactory(new PropertyValueFactory<>("materialNumber"));
+		column_description.setCellValueFactory(new PropertyValueFactory<>("description"));
+		column_weighed.setCellValueFactory(new PropertyValueFactory<>("weighed"));
+		column_weighed.setCellFactory(CheckBoxTableCell.forTableColumn(column_weighed));
+		column_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+		column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
+		column_plu.setCellValueFactory(new PropertyValueFactory<>("plu"));
+		column_labelId.setCellValueFactory(new PropertyValueFactory<>("labelId"));
+
+		data = FXCollections.observableArrayList(new Article(
+				1,
+				"Мыло \"Хуило\"",
+				"Волшебное мыло - с одной стороны пики точеные, с другой - хуи дроченые!",
+				500.0,
+				true,
+				123,
+				123,
+				"22.12.2012",
+				666,
+				555));
+
+		data.add(new Article(
+				1,
+				"Жопа \"Хуепа\"",
+				"Конский член в овечьей жопе - это русские в Европе!!",
+				1200,
+				false,
+				123,
+				123,
+				"01.01.2017",
+				6,
+				5));
+
+		data.add(new Article(
+				1,
+				"Жепь \"Ебрило\"",
+				"Щячло попячьться адинадин ОЛООлолОЛо Онотоле Негодуе!!!1!!один!!11",
+				0.45,
+				true,
+				1223,
+				13,
+				"01.01.2016",
+				1,
+				2));
 		data.addListener((ListChangeListener<Article>) change -> updateFilteredData());
 
 		filteredData = FXCollections.observableArrayList();
 		filteredData.addAll(data);
 
-		articlesTable.getColumns().addAll(ID, materialNumber, materialDescription, weighed);
+		articlesTable.getColumns().addAll(
+				column_id,
+				column_materialNumber,
+				column_name,
+				column_description,
+				column_weighed,
+				column_price,
+				column_plu,
+				column_labelId);
 		articlesTable.setItems(filteredData);
 		articlesTable.setVisible(true);
 		articlesTable.setEditable(false);
-		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, article, t1) -> {
-			LOGGER.info(t1.toString());
-			updateInformation(t1);
+		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, article, item) -> {
+			LOGGER.info(item.getName());
+			updateInformation(item);
 		});
 	}
 
@@ -466,8 +519,7 @@ public class WAManager extends Application {
 	 * Returns true if the article matches the current filter. Lower/Upper case
 	 * is ignored.
 	 *
-	 * @param article
-	 * @return
+	 * @param article table row to filter
 	 */
 	private boolean matchesFilter(Article article) {
 		String filterString = quickSearchField.getText();
@@ -476,7 +528,9 @@ public class WAManager extends Application {
 			return true;
 		}
 		String filterLower = filterString.toLowerCase();
-		if (article.getMaterialDescription().toLowerCase().contains(filterLower)) {
+		if (article.getDescription().toLowerCase().contains(filterLower)) {
+			return true;
+		} else if (article.getName().toLowerCase().contains(filterLower)) {
 			return true;
 		}
 		return false; // Does not match
@@ -489,8 +543,10 @@ public class WAManager extends Application {
 	}
 
 	private void updateInformation(Article article) {
-		fullArticleDescription.setText(article.toString());
-		shortArticleDescription.setText(article.getMaterialDescription());
+		fullArticleDescription.setText(article.getDescription());
+		shortArticleDescription.setText(article.getName());
+		validUntilDatePicker
+				.setValue(LocalDate.parse(article.getExpiryDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 	}
 
 	private void initExitButton() {
