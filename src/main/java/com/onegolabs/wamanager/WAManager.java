@@ -37,6 +37,7 @@ public class WAManager extends Application {
 	private Button refresh;
 	private SplitPane mainSplitPane;
 	private BorderPane topBorderPane;
+    private GridPane topGridPane;
 	private HBox topButtonBox;
 	private GridPane bottomGridPane;
 	private Button upload;
@@ -66,8 +67,12 @@ public class WAManager extends Application {
 	private Callback<DatePicker, DateCell> cellFactory;
 	private ObservableList<Article> data;
 	private ObservableList<Article> filteredData;
+    private MenuBar topMenu;
+    private Menu viewMenu;
+    private Menu helpMenu;
+    private MenuItem aboutAppMenuItem;
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		LauncherImpl.launchApplication(WAManager.class, WamPreLoader.class, args);
 	}
 
@@ -91,6 +96,10 @@ public class WAManager extends Application {
 		initArticlesTable();
 		initPrimaryStage();
 		initTopButtonBox();
+        initViewMenu();
+        initHelpMenu();
+        initTopMenu();
+        initTopGridPane();
 		initTopBorderPane();
 		initBottomGridPane();
 		initMainSplitPane();
@@ -122,7 +131,66 @@ public class WAManager extends Application {
 
 	}
 
-	private void initMfrExpiryDateLabel() {
+    private void initHelpMenu() {
+        helpMenu = new Menu(Messages.getString("helpMenu"));
+        aboutAppMenuItem = new MenuItem(Messages.getString("aboutApp"));
+        helpMenu.setOnAction(e -> {
+            showProgramInfo();
+        });
+        helpMenu.getItems().add(aboutAppMenuItem);
+
+    }
+
+    private void showProgramInfo() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(Messages.getString("aboutApp"));
+        alert.setHeaderText(Messages.getString("title"));
+        alert.setContentText("message");
+
+        TextArea textArea = new TextArea(Messages.getString("aboutAppInfo"));
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane content = new GridPane();
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.add(textArea, 0, 1);
+
+        // Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setContent(content);
+        alert.showAndWait();
+    }
+
+    private void initViewMenu() {
+        viewMenu = new Menu(Messages.getString("viewMenu"));
+    }
+
+    private void initTopGridPane() {
+        topGridPane = new GridPane();
+        initTopGridPaneConstraints();
+        topGridPane.add(topMenu, 0, 0);
+        topGridPane.add(topButtonBox, 0, 1);
+    }
+
+    private void initTopGridPaneConstraints() {
+        ColumnConstraints topMenuConstraints = new ColumnConstraints();
+        topMenuConstraints.setHgrow(Priority.ALWAYS);
+
+        ColumnConstraints topButtonBoxConstraints = new ColumnConstraints();
+
+        topGridPane.getColumnConstraints().addAll(topMenuConstraints, topButtonBoxConstraints);
+    }
+
+    private void initTopMenu() {
+        topMenu = new MenuBar();
+        topMenu.getMenus().addAll(viewMenu, helpMenu);
+    }
+
+    private void initMfrExpiryDateLabel() {
 		mfrExpiryDateLabel = new Label(Messages.getString("mfrExpiryDate"));
 	}
 
@@ -168,14 +236,12 @@ public class WAManager extends Application {
 	}
 
 	private void initMfrExpiryDatePicker() {
-		mfrExpiryDatePicker = new DatePicker();
-		mfrExpiryDatePicker.setEditable(false);
-		mfrExpiryDatePicker.setPromptText(Messages.getString("datePlaceholder"));
-		mfrExpiryDatePicker.setConverter(dateConverter);
-		mfrExpiryDatePicker.setDayCellFactory(cellFactory);
-		mfrExpiryDatePicker
-				.setOnAction(e -> LOGGER.info("Man. date selected: " + mfrExpiryDatePicker.getEditor().getText()));
-	}
+        mfrExpiryDatePicker = new DatePicker();
+        mfrExpiryDatePicker.setEditable(false);
+        mfrExpiryDatePicker.setPromptText(Messages.getString("datePlaceholder"));
+        mfrExpiryDatePicker.setConverter(dateConverter);
+        mfrExpiryDatePicker.setDayCellFactory(cellFactory);
+    }
 
 	private void initBottomExpiryDatesPane() {
 		bottomExpiryDatesPane = new GridPane();
@@ -187,11 +253,11 @@ public class WAManager extends Application {
 	}
 
 	private void initBottomExpiryDatesPaneConstraints() {
-		ColumnConstraints validUntilLabelConstraints = new ColumnConstraints(60);
+		ColumnConstraints validUntilLabelConstraints = new ColumnConstraints(60, 60, Double.MAX_VALUE);
 
 		ColumnConstraints validUntilDatePickerConstraints = new ColumnConstraints(110);
 
-		ColumnConstraints smallSplitterConstraints = new ColumnConstraints(10);
+		ColumnConstraints smallSplitterConstraints = new ColumnConstraints(0, 10, Double.MAX_VALUE);
 
 		ColumnConstraints mfrExpiryDateFieldConstraints = new ColumnConstraints(180);
 
@@ -203,7 +269,6 @@ public class WAManager extends Application {
 		ColumnConstraints scalesLabelConstraints = new ColumnConstraints(50);
 
 		ColumnConstraints scalesDescriptionLabelConstraints = new ColumnConstraints(300);
-
 		bottomExpiryDatesPane.getColumnConstraints().addAll(validUntilLabelConstraints,
 				validUntilDatePickerConstraints,
 				smallSplitterConstraints,
@@ -220,10 +285,6 @@ public class WAManager extends Application {
 		validUntilDatePicker.setPromptText(Messages.getString("datePlaceholder"));
 		validUntilDatePicker.setConverter(dateConverter);
 		validUntilDatePicker.setDayCellFactory(cellFactory);
-		validUntilDatePicker.setOnAction(e -> {
-			LOGGER.info("Date selected: " + validUntilDatePicker.getEditor().getText());
-			validUntilLabel.setText("Дата вскрытия:");
-		});
 	}
 
 	private void initValidUntilLabel() {
@@ -407,7 +468,7 @@ public class WAManager extends Application {
 
 	private void initTopBorderPane() {
 		topBorderPane = new BorderPane();
-		topBorderPane.setTop(topButtonBox);
+		topBorderPane.setTop(topGridPane);
 		topBorderPane.setLeft(new Label());
 		topBorderPane.setCenter(articlesTable);
 	}
@@ -446,8 +507,8 @@ public class WAManager extends Application {
 
 		data = FXCollections.observableArrayList(new Article(
 				1,
-				"Мыло \"Хуило\"",
-				"Волшебное мыло - с одной стороны пики точеные, с другой - хуи дроченые!",
+				"Мыло \"Черепашка\"",
+				"Волшебное мыло - вкусы \"Грифовая\", \"Трионикс\"",
 				500.0,
 				true,
 				123,
@@ -458,8 +519,8 @@ public class WAManager extends Application {
 
 		data.add(new Article(
 				1,
-				"Жопа \"Хуепа\"",
-				"Конский член в овечьей жопе - это русские в Европе!!",
+				"Бутылка водки",
+				"Гадость кислющая, но зачем-то же её пьют! Вот-таки странная то вещь творится на земле Русской!",
 				1200,
 				false,
 				123,
@@ -542,14 +603,38 @@ public class WAManager extends Application {
 		articlesTable.getSortOrder().addAll(sortOrder);
 	}
 
+    /**
+     * Changes layout for weighted article back and forth
+     * @param article article to change layout for
+     */
 	private void updateInformation(Article article) {
+        adjustVisibilityAndSize(article);
 		fullArticleDescription.setText(article.getDescription());
 		shortArticleDescription.setText(article.getName());
 		validUntilDatePicker
 				.setValue(LocalDate.parse(article.getExpiryDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 	}
 
-	private void initExitButton() {
+    private void adjustVisibilityAndSize(Article article) {
+        ColumnConstraints c;
+        if(article.getWeighed()) {
+            validUntilLabel.setText(Messages.getString("unpackingLabel"));
+            c = new ColumnConstraints(90);
+            bottomExpiryDatesPane.getColumnConstraints().remove(0);
+            bottomExpiryDatesPane.getColumnConstraints().add(0, c);
+            mfrExpiryDateLabel.setVisible(true);
+            mfrExpiryDatePicker.setVisible(true);
+        } else {
+            validUntilLabel.setText(Messages.getString("validUntil"));
+            c = new ColumnConstraints(60);
+            bottomExpiryDatesPane.getColumnConstraints().remove(0);
+            bottomExpiryDatesPane.getColumnConstraints().add(0, c);
+            mfrExpiryDateLabel.setVisible(false);
+            mfrExpiryDatePicker.setVisible(false);
+        }
+    }
+
+    private void initExitButton() {
 		ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/icons/exit.png"),
 				30,
 				30,
