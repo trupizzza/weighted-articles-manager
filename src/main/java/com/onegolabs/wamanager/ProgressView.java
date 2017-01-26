@@ -13,13 +13,13 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class ProgressForm {
+public class ProgressView {
 
 	private final Stage dialogStage;
 	private final ProgressBar progressBar = new ProgressBar();
 	private final Label statusLabel = new Label();
 
-	public ProgressForm() {
+	public ProgressView() {
 		dialogStage = new Stage();
 		dialogStage.setTitle(Messages.getString("loadingArticlesIntoScales"));
 		dialogStage.getIcons()

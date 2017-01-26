@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 /**
  * @author dmzhg
  */
-public class MyPreLoader extends Preloader {
+public class WamPreLoader extends Preloader {
 
 	private static Configuration settings;
 
