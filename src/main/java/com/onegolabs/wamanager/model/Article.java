@@ -1,166 +1,152 @@
 package com.onegolabs.wamanager.model;
 
+import javafx.beans.property.*;
+
 /**
  * @author dmzhg
  */
 public class Article {
 
-    private int materialNumber;
-    private String materialName;
-    private String materialDescription;
-    private double materialPrice;
-    private boolean weighed;
-    private int pluCode;
-    private int expiryDaysCount;
-    private String expiryDate;
-    private int labelIndex;
-    private int uniqueID;
+	private IntegerProperty materialNumber;
+	private StringProperty materialName;
+	private StringProperty materialDescription;
+	private DoubleProperty materialPrice;
+	private BooleanProperty weighed;
+	private IntegerProperty pluCode;
+	private IntegerProperty expiryDaysCount;
+	private StringProperty expiryDate;
+	private IntegerProperty labelIndex;
 
-    public Article(int uniqueID, int materialNumber, double price) {
-        this.uniqueID = uniqueID;
-        this.materialNumber = materialNumber;
-        this.materialPrice = price;
-    }
-    /**
-     * @return the materialNumber
-     */
-    public int getMaterialNumber() {
-        return materialNumber;
-    }
+	public Article(
+			int materialNumber,
+			String materialName,
+			String materialDescription,
+			boolean weighed) {
+		this.materialNumber = new SimpleIntegerProperty(materialNumber);
+		this.materialName = new SimpleStringProperty(materialName);
+		this.materialDescription = new SimpleStringProperty(materialDescription);
+		this.weighed = new SimpleBooleanProperty(weighed);
+	}
 
-    /**
-     * @param materialNumber the materialNumber to set
-     */
-    public void setMaterialNumber(int materialNumber) {
-        this.materialNumber = materialNumber;
-    }
+	private IntegerProperty uniqueID;
 
-    /**
-     * @return the materialName
-     */
-    public String getMaterialName() {
-        return materialName;
-    }
+	public int getMaterialNumber() {
+		return materialNumber.get();
+	}
 
-    /**
-     * @param materialName the materialName to set
-     */
-    public void setMaterialName(final String materialName) {
-        this.materialName = materialName;
-    }
+	public void setMaterialNumber(int materialNumber) {
+		this.materialNumber.set(materialNumber);
+	}
 
-    /**
-     * @return the materialDescription
-     */
-    public String getMaterialDescription() {
-        return materialDescription;
-    }
+	public IntegerProperty materialNumberProperty() {
+		return materialNumber;
+	}
 
-    /**
-     * @param materialDescription the materialDescription to set
-     */
-    public void setMaterialDescription(String materialDescription) {
-        this.materialDescription = materialDescription;
-    }
+	public String getMaterialName() {
+		return materialName.get();
+	}
 
-    /**
-     * @return the materialPrice
-     */
-    public double getMaterialPrice() {
-        return materialPrice;
-    }
+	public void setMaterialName(String materialName) {
+		this.materialName.set(materialName);
+	}
 
-    /**
-     * @param price the materialPrice to set
-     */
-    public void setMaterialPrice(double price) {
-        this.materialPrice = price;
-    }
+	public StringProperty materialNameProperty() {
+		return materialName;
+	}
 
-    /**
-     * @return the weighed
-     */
-    public boolean isWeighed() {
-        return weighed;
-    }
+	public String getMaterialDescription() {
+		return materialDescription.get();
+	}
 
-    /**
-     * @param weighted the weighed to set
-     */
-    public void setWeighed(String weighted) {
-        this.weighed =
-                weighted != null
-                        && !weighted.isEmpty()
-                        && weighted.equalsIgnoreCase("Y");
-    }
+	public void setMaterialDescription(String materialDescription) {
+		this.materialDescription.set(materialDescription);
+	}
 
-    /**
-     * @return the pluCode
-     */
-    public int getPluCode() {
-        return pluCode;
-    }
+	public StringProperty materialDescriptionProperty() {
+		return materialDescription;
+	}
 
-    /**
-     * @param pluCode the pluCode to set
-     */
-    public void setPluCode(int pluCode) {
-        this.pluCode = pluCode;
-    }
+	public double getMaterialPrice() {
+		return materialPrice.get();
+	}
 
-    /**
-     * @return the expiryDaysCount
-     */
-    public int getExpiryDaysCount() {
-        return expiryDaysCount;
-    }
+	public void setMaterialPrice(double materialPrice) {
+		this.materialPrice.set(materialPrice);
+	}
 
-    /**
-     * @param expiryDaysCount the expiryDaysCount to set
-     */
-    public void setExpiryDaysCount(int expiryDaysCount) {
-        this.expiryDaysCount = expiryDaysCount;
-    }
+	public DoubleProperty materialPriceProperty() {
+		return materialPrice;
+	}
 
-    /**
-     * @return the expiryDate
-     */
-    public String getExpiryDate() {
-        return expiryDate;
-    }
+	public boolean getWeighed() {
+		return weighed.get();
+	}
 
-    /**
-     * @param expiryDate the expiryDate to set
-     */
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
-    }
+	public void setWeighed(boolean weighed) {
+		this.weighed.set(weighed);
+	}
 
-    /**
-     * @return the labelIndex
-     */
-    public int getLabelIndex() {
-        return labelIndex;
-    }
+	public BooleanProperty weighedProperty() {
+		return weighed;
+	}
 
-    /**
-     * @param labelIndex the labelIndex to set
-     */
-    public void setLabelIndex(int labelIndex) {
-        this.labelIndex = labelIndex;
-    }
+	public int getPluCode() {
+		return pluCode.get();
+	}
 
-    /**
-     * @return the uniqueID
-     */
-    public int getUniqueID() {
-        return uniqueID;
-    }
+	public void setPluCode(int pluCode) {
+		this.pluCode.set(pluCode);
+	}
 
-    /**
-     * @param uniqueID the uniqueID to set
-     */
-    public void setUniqueID(int uniqueID) {
-        this.uniqueID = uniqueID;
-    }
+	public IntegerProperty pluCodeProperty() {
+		return pluCode;
+	}
+
+	public int getExpiryDaysCount() {
+		return expiryDaysCount.get();
+	}
+
+	public void setExpiryDaysCount(int expiryDaysCount) {
+		this.expiryDaysCount.set(expiryDaysCount);
+	}
+
+	public IntegerProperty expiryDaysCountProperty() {
+		return expiryDaysCount;
+	}
+
+	public String getExpiryDate() {
+		return expiryDate.get();
+	}
+
+	public void setExpiryDate(String expiryDate) {
+		this.expiryDate.set(expiryDate);
+	}
+
+	public StringProperty expiryDateProperty() {
+		return expiryDate;
+	}
+
+	public int getLabelIndex() {
+		return labelIndex.get();
+	}
+
+	public void setLabelIndex(int labelIndex) {
+		this.labelIndex.set(labelIndex);
+	}
+
+	public IntegerProperty labelIndexProperty() {
+		return labelIndex;
+	}
+
+	public int getUniqueID() {
+		return uniqueID.get();
+	}
+
+	public void setUniqueID(int uniqueID) {
+		this.uniqueID.set(uniqueID);
+	}
+
+	public IntegerProperty uniqueIDProperty() {
+		return uniqueID;
+	}
 }
