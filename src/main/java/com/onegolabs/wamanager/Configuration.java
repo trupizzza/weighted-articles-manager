@@ -79,13 +79,13 @@ public class Configuration {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Application properties list [property:value] for file : ");
 		sb.append(configFileName).append("\r\n");
-		sb.append("----------").append("\r\n");
+		sb.append("--------------------").append("\r\n");
 		for (String key : properties.stringPropertyNames()) {
 			String value = properties.getProperty(key);
 			sb.append(key).append(" : ");
 			sb.append(value).append("\r\n");
 		}
-		sb.append("----------").append("\r\n");
+		sb.append("--------------------").append("\r\n");
 		LOGGER.debug(sb.toString());
 	}
 

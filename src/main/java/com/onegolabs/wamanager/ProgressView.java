@@ -16,12 +16,11 @@ import javafx.stage.Stage;
 
 public class ProgressView {
 
-	private final Stage dialogStage;
+	private final Stage dialogStage = new Stage();
 	private final ProgressBar progressBar = new ProgressBar();
 	private final Label statusLabel = new Label();
 
 	public ProgressView() {
-		dialogStage = new Stage();
 		dialogStage.setTitle(Messages.getString("loadingArticlesIntoScales"));
 		dialogStage.getIcons()
 				   .setAll(new Image(getClass().getResourceAsStream("/icons/app_icon.png"), 300, 300, false, false));

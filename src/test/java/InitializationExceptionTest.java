@@ -15,20 +15,20 @@ public class InitializationExceptionTest {
 	private Configuration config = new Configuration();
 
 	@Test
-	public void testExceptionHappening() throws InitializationException {
+	public void exceptionHappening() throws InitializationException {
 		thrown.expect(InitializationException.class);
 		throw new InitializationException();
 	}
 
 	@Test
-	public void testConfigFileNotFoundInitializationException() throws InitializationException {
+	public void configFileNotFoundInitializationException() throws InitializationException {
 		thrown.expect(InitializationException.class);
 		thrown.expectMessage(Messages.getString("configFileNotFound"));
 		config.init();
 	}
 
 	@Test
-	public void testWrapping() throws InitializationException {
+	public void wrapping() throws InitializationException {
 		thrown.expect(InitializationException.class);
 		throw new InitializationException("LOL-KEK_ChEBUREK", new IllegalArgumentException(), null);
 	}

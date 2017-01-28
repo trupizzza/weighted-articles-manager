@@ -6,6 +6,7 @@ import javafx.concurrent.Task;
  * @author dmzhg
  */
 public class SimpleTask extends Task<Void> {
+
 	@Override
 	protected Void call() throws Exception {
 		int max = 50;
