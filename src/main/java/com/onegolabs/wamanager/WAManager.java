@@ -3,6 +3,7 @@ package com.onegolabs.wamanager;
 import com.onegolabs.Messages;
 import com.onegolabs.SimpleService;
 import com.onegolabs.wamanager.model.Article;
+import com.onegolabs.wamanager.view.TableColumnsConfigurationView;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -72,8 +73,10 @@ public class WAManager extends Application {
     private Menu viewMenu;
     private Menu helpMenu;
     private MenuItem aboutAppMenuItem;
+	private ObservableList<TableColumn<Article, ?>> columns;
+	private MenuItem configureColumnsMenuItem;
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 		LauncherImpl.launchApplication(WAManager.class, WamPreLoader.class, args);
 	}
 
@@ -168,7 +171,12 @@ public class WAManager extends Application {
 
     private void initViewMenu() {
         viewMenu = new Menu(Messages.getString("viewMenu"));
-    }
+		configureColumnsMenuItem = new MenuItem(Messages.getString("configureColumnsItem"));
+		viewMenu.getItems().add(configureColumnsMenuItem);
+		configureColumnsMenuItem.setOnAction(e -> {
+			TableColumnsConfigurationView view = new TableColumnsConfigurationView();
+		});
+	}
 
     private void initTopGridPane() {
         topGridPane = new GridPane();
@@ -482,29 +490,8 @@ public class WAManager extends Application {
 	private void initArticlesTable() {
 		articlesTable = new TableView<>();
 		articlesTable.setPlaceholder(new Label(Messages.getString("noContentInTable")));
+		initArticlesTableColumns();
 
-		TableColumn<Article, Integer> column_id = new TableColumn<>(Messages.getString("column_ID"));
-		TableColumn<Article, String> column_materialNumber = new TableColumn<>(Messages
-				.getString("column_materialNumber"));
-		TableColumn<Article, String> column_name = new TableColumn<>(Messages.getString("column_name"));
-		TableColumn<Article, String> column_description = new TableColumn<>(Messages
-				.getString("column_materialDescription"));
-		TableColumn<Article, Boolean> column_weighed = new TableColumn<>(Messages.getString("column_weighed"));
-		TableColumn<Article, Double> column_price = new TableColumn<>(Messages.getString("column_price"));
-		TableColumn<Article, Integer> column_plu = new TableColumn<>(Messages.getString("column_plu"));
-		TableColumn<Article, Double> column_labelId = new TableColumn<>(Messages.getString("column_labelId"));
-
-		column_weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
-																										  .weighedProperty());
-		column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
-		column_materialNumber.setCellValueFactory(new PropertyValueFactory<>("materialNumber"));
-		column_description.setCellValueFactory(new PropertyValueFactory<>("description"));
-		column_weighed.setCellValueFactory(new PropertyValueFactory<>("weighed"));
-		column_weighed.setCellFactory(CheckBoxTableCell.forTableColumn(column_weighed));
-		column_price.setCellValueFactory(new PropertyValueFactory<>("price"));
-		column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
-		column_plu.setCellValueFactory(new PropertyValueFactory<>("plu"));
-		column_labelId.setCellValueFactory(new PropertyValueFactory<>("labelId"));
 
 		data = FXCollections.observableArrayList(new Article(
 				1,
@@ -546,6 +533,39 @@ public class WAManager extends Application {
 		filteredData = FXCollections.observableArrayList();
 		filteredData.addAll(data);
 
+		articlesTable.setItems(filteredData);
+		articlesTable.setVisible(true);
+		articlesTable.setEditable(false);
+		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, article, item) -> {
+			LOGGER.info(item.getName());
+			updateInformation(item);
+		});
+	}
+
+	private void initArticlesTableColumns() {
+		TableColumn<Article, Integer> column_id = new TableColumn<>(Messages.getString("column_ID"));
+		TableColumn<Article, String> column_materialNumber = new TableColumn<>(Messages
+				.getString("column_materialNumber"));
+		TableColumn<Article, String> column_name = new TableColumn<>(Messages.getString("column_name"));
+		TableColumn<Article, String> column_description = new TableColumn<>(Messages
+				.getString("column_materialDescription"));
+		TableColumn<Article, Boolean> column_weighed = new TableColumn<>(Messages.getString("column_weighed"));
+		TableColumn<Article, Double> column_price = new TableColumn<>(Messages.getString("column_price"));
+		TableColumn<Article, Integer> column_plu = new TableColumn<>(Messages.getString("column_plu"));
+		TableColumn<Article, Double> column_labelId = new TableColumn<>(Messages.getString("column_labelId"));
+
+		column_weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
+																										  .weighedProperty());
+		column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
+		column_materialNumber.setCellValueFactory(new PropertyValueFactory<>("materialNumber"));
+		column_description.setCellValueFactory(new PropertyValueFactory<>("description"));
+		column_weighed.setCellValueFactory(new PropertyValueFactory<>("weighed"));
+		column_weighed.setCellFactory(CheckBoxTableCell.forTableColumn(column_weighed));
+		column_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+		column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
+		column_plu.setCellValueFactory(new PropertyValueFactory<>("plu"));
+		column_labelId.setCellValueFactory(new PropertyValueFactory<>("labelId"));
+
 		articlesTable.getColumns().addAll(
 				column_id,
 				column_materialNumber,
@@ -555,13 +575,8 @@ public class WAManager extends Application {
 				column_price,
 				column_plu,
 				column_labelId);
-		articlesTable.setItems(filteredData);
-		articlesTable.setVisible(true);
-		articlesTable.setEditable(false);
-		articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, article, item) -> {
-			LOGGER.info(item.getName());
-			updateInformation(item);
-		});
+
+		columns = articlesTable.getColumns();
 	}
 
 	private void updateFilteredData() {

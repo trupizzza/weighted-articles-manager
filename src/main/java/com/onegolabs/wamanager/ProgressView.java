@@ -41,7 +41,7 @@ public class ProgressView {
 		gp.add(progressBar, 0, 0);
 		gp.add(statusLabel, 0, 1);
 
-		Scene scene = new Scene(gp, 450, 30);
+		Scene scene = new Scene(gp, 450, 40);
 		dialogStage.setScene(scene);
 	}
 
