@@ -1,5 +1,6 @@
 package com.onegolabs.wamanager;
 
+import com.onegolabs.Messages;
 import javafx.concurrent.Service;
 import javafx.event.Event;
 import javafx.geometry.HPos;

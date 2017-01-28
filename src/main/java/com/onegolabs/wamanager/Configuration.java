@@ -1,14 +1,14 @@
 package com.onegolabs.wamanager;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import com.onegolabs.wamanager.exception.ConfigurationCode;
+import com.onegolabs.wamanager.exception.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -25,19 +25,15 @@ public class Configuration {
 	private Properties customConfig;
 	private Properties defaultConfig;
 
-	public void init() {
+	public void init() throws InitializationException {
 		LOGGER.info("Loading default config");
 		this.defaultConfig = loadConfig(DEFAULT_CONFIG_FILE_NAME);
 		LOGGER.info("Loading custom config");
 		this.customConfig = loadConfig(CONFIG_FILE_NAME);
 	}
 
-	public Properties getCustom() {
+	private Properties getCustom() {
 		return customConfig;
-	}
-
-	public Properties getDefault() {
-		return defaultConfig;
 	}
 
 	/**
@@ -47,8 +43,8 @@ public class Configuration {
 	 *
 	 * @return customer properties for app
 	 */
-	private Properties loadConfig(String configFileName) {
-		Properties properties = null;
+	private Properties loadConfig(String configFileName) throws InitializationException {
+		Properties properties;
 		InputStream input;
 		try {
 			input = this.getClass().getClassLoader().getResourceAsStream(configFileName);
@@ -56,15 +52,19 @@ public class Configuration {
 				// try to load from project folder
 				input = new FileInputStream(configFileName);
 			}
-			properties = new Properties();
+			if (configFileName.equals(CONFIG_FILE_NAME)) {
+				// initialize defaults
+				properties = new Properties(defaultConfig);
+			} else {
+				properties = new Properties();
+			}
 			properties.load(input);
 			logProperties(configFileName, properties);
 		} catch (FileNotFoundException e) {
-			LOGGER.error("Error while loading configuration file " + configFileName, e);
-			showErrorMessage(e);
+			throw new InitializationException(e, ConfigurationCode.FILE_NOT_FOUND).set("fileName", configFileName);
 		} catch (IOException e) {
-			e.printStackTrace();
-			showErrorMessage(e);
+			throw new InitializationException(e, ConfigurationCode.ERROR_WHILE_READING_FILE)
+					.set("fileName", configFileName);
 		}
 		return properties;
 	}
@@ -89,41 +89,7 @@ public class Configuration {
 		LOGGER.debug(sb.toString());
 	}
 
-	private void showErrorMessage(Exception ex) {
-		String title = Messages.getString("errorLoadConfigTitle");
-		String message = Messages.getString("errorLoadConfigMessage");
-
-		Alert alert = new Alert(Alert.AlertType.ERROR);
-		alert.setTitle("Exception");
-		alert.setHeaderText(title);
-		alert.setContentText(message);
-
-		// Create expandable Exception.
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		ex.printStackTrace(pw);
-		String exceptionText = sw.toString();
-		String exceptionLabelError = Messages.getString("exceptionLabelError");
-		Label label = new Label(exceptionLabelError);
-
-		TextArea textArea = new TextArea(exceptionText);
-		textArea.setEditable(false);
-		textArea.setWrapText(true);
-
-		textArea.setMaxWidth(Double.MAX_VALUE);
-		textArea.setMaxHeight(Double.MAX_VALUE);
-		GridPane.setVgrow(textArea, Priority.ALWAYS);
-		GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-		GridPane expContent = new GridPane();
-		expContent.setMaxWidth(Double.MAX_VALUE);
-		expContent.add(label, 0, 0);
-		expContent.add(textArea, 0, 1);
-
-		// Set expandable Exception into the dialog pane.
-		alert.getDialogPane().setExpandableContent(expContent);
-		alert.getDialogPane().setExpanded(true);
-		alert.showAndWait();
-		System.exit(1);
+	public String getProperty(String key) {
+		return this.getCustom().getProperty(key);
 	}
 }

@@ -1,5 +1,6 @@
 package com.onegolabs.wamanager;
 
+import com.onegolabs.Messages;
 import com.onegolabs.SimpleService;
 import com.onegolabs.wamanager.model.Article;
 import com.sun.javafx.application.LauncherImpl;
@@ -324,7 +325,7 @@ public class WAManager extends Application {
 
 	private void initScalesDescriptionLabel() {
 		scalesDescriptionLabel = new Label();
-		scalesDescriptionLabel.setText(settings.getCustom().getProperty("aclas-001.name"));
+		scalesDescriptionLabel.setText(settings.getProperty("aclas-001.name"));
 	}
 
 	private void initScalesLabel() {

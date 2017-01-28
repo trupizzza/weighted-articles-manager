@@ -1,26 +1,52 @@
 import com.onegolabs.wamanager.Configuration;
-import junit.framework.TestCase;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.lang.reflect.Field;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
 /**
  * @author dmzhg
  */
-public class ConfigurationTest extends TestCase {
+public class ConfigurationTest {
 
-	private Configuration config;
+	private static Configuration config;
 
-	@Override
-	protected void setUp() {
+	@BeforeClass
+	public static void setUp() {
 		config = new Configuration();
 	}
 
-	public void testLoadDefaultConfig() {
+	@Test
+	public void initialization() throws NoSuchFieldException, IllegalAccessException, InstantiationException {
 		config.init();
-		assertNotNull(config.getDefault());
+		Field customConfig = config.getClass().getDeclaredField("customConfig");
+		customConfig.setAccessible(true);
+		Object customPropsValue = customConfig.get(config);
+
+		Field defaultConfig = config.getClass().getDeclaredField("defaultConfig");
+		defaultConfig.setAccessible(true);
+		Object defaultConfigValue = defaultConfig.get(config);
+
+		assertNotNull(customPropsValue);
+		assertNotNull(defaultConfigValue);
 	}
 
-	public void testLoadCustomConfig() {
+	@Test
+	public void shouldGetCustomInsteadOfDefaultProperty() throws NoSuchFieldException, IllegalAccessException {
 		config.init();
-		assertNotNull(config.getCustom());
+		Field defaultConfig = config.getClass().getDeclaredField("defaultConfig");
+		defaultConfig.setAccessible(true);
+		Object defaultConfigValue = defaultConfig.get(config);
+		assertNotSame(config.getProperty("test"), defaultConfigValue);
+	}
+
+	@Test
+	public void shouldGetDefaultPropertyIfNoCustomFound() throws Exception {
+		config.init();
+		assertNotNull(config.getProperty("nullProperty"));
 	}
 }
 
