@@ -8,7 +8,7 @@ package com.onegolabs.wamanager.exception;
 public enum ConnectionCode implements ErrorCode {
 
 	NO_CONNECTION(0),
-	WRONG_DB_CHOSEN(1);
+	WRONG_DB_CHOSEN(1), NO_DRIVER_FOUND(2);
 
 	private final int code;
 
