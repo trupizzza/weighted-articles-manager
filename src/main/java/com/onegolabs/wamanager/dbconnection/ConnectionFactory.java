@@ -14,7 +14,7 @@ public class ConnectionFactory {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactory.class);
 
-	private static ConnectionFactory instance = new ConnectionFactory();
+	private static ConnectionFactory instance = new ConnectionFactory(new Configuration());
 
 	private Configuration config;
 

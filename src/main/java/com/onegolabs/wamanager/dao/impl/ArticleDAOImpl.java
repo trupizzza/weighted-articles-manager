@@ -12,27 +12,26 @@ import java.util.List;
  */
 public class ArticleDAOImpl implements ArticleDAO {
 
-	private Connection connection;
-	private Statement statement;
+    private Connection connection;
+    private Statement statement;
 
+    @Override
+    public List<Article> getAllArticles() {
+        return null;
+    }
 
-	@Override
-	public List<Article> getAllArticles() {
-		return null;
-	}
+    @Override
+    public Article getArticle(int rollNo) {
+        return null;
+    }
 
-	@Override
-	public Article getArticle(int rollNo) {
-		return null;
-	}
+    @Override
+    public void updateArticle(Article student) {
 
-	@Override
-	public void updateArticle(Article student) {
+    }
 
-	}
+    @Override
+    public void deleteArticle(Article student) {
 
-	@Override
-	public void deleteArticle(Article student) {
-
-	}
+    }
 }
