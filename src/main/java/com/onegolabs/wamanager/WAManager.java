@@ -5,6 +5,7 @@ import com.onegolabs.SimpleService;
 import com.onegolabs.wamanager.model.Article;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -24,9 +25,13 @@ import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * @author dmzhg
@@ -73,7 +78,7 @@ public class WAManager extends Application {
     private Menu helpMenu;
     private MenuItem aboutAppMenuItem;
 
-    private MenuItem saveColumnsOrderMenuItem;
+    private MenuItem setDefaultColumnsOrderMenuItem;
     private ObservableList<? extends TableColumn<Article, ?>> currentColumnsOrder;
     private ObservableList<TableColumn<Article, ?>> defaultColumns;
 
@@ -87,6 +92,15 @@ public class WAManager extends Application {
         window = primaryStage;
         initGUI();
         window.show();
+        window.setOnCloseRequest(event -> {
+            LOGGER.info("Exiting...");
+            try {
+                writeColumnsOrderToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Platform.exit();
+        });
     }
 
     private void initGUI() {
@@ -167,17 +181,19 @@ public class WAManager extends Application {
 
     private void initViewMenu() {
         viewMenu = new Menu(Messages.getString("viewMenu"));
-        saveColumnsOrderMenuItem = new MenuItem(Messages.getString("saveColumnsOrderItem"));
-        viewMenu.getItems().add(saveColumnsOrderMenuItem);
-        viewMenu.getItems().add(new CheckMenuItem("CHECK ME!"));
-        saveColumnsOrderMenuItem.setOnAction(e -> {
-            // TODO: gogogogogogogog
+        setDefaultColumnsOrderMenuItem = new MenuItem(Messages.getString("defaultColumnsOrderItem"));
+        viewMenu.getItems().add(setDefaultColumnsOrderMenuItem);
+        setDefaultColumnsOrderMenuItem.setOnAction(e -> {
+            articlesTable.getColumns().clear();
+            articlesTable.getColumns().addAll(defaultColumns);
         });
     }
 
-    private void writeColumnsOrderToFile() {
-
-        // TODO: save sort order to file
+    private void writeColumnsOrderToFile() throws IOException {
+        settings.setProperty("columnsOrder", "1,2,3,4,5,6,7");
+        File configFile = new File("config.properties");
+        FileWriter writer = new FileWriter(configFile);
+        settings.store(writer, "Customer settings");
     }
 
     private void initTopGridPane() {
@@ -428,7 +444,7 @@ public class WAManager extends Application {
         quickSearchField = new TextField();
         quickSearchField.setPromptText(Messages.getString("enterArticleCode"));
         quickSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateFilteredData();
+            updateTableFilteredData();
         });
     }
 
@@ -493,7 +509,7 @@ public class WAManager extends Application {
         articlesTable = new TableView<>();
         articlesTable.setPlaceholder(new Label(Messages.getString("noContentInTable")));
         initArticlesTableColumns();
-        orderArticleTableColumns("1, 0, 2, 3, 4, 6, 5 ,7".replaceAll("\\s", ""));
+        setColumnsOrder(settings.getProperty("columnsOrder"));
 
         data = FXCollections.observableArrayList(new Article(
                 "1",
@@ -530,7 +546,7 @@ public class WAManager extends Application {
                 "01.01.2016",
                 1,
                 2));
-        data.addListener((ListChangeListener<Article>) change -> updateFilteredData());
+        data.addListener((ListChangeListener<Article>) change -> updateTableFilteredData());
 
         filteredData = FXCollections.observableArrayList();
         filteredData.addAll(data);
@@ -548,11 +564,12 @@ public class WAManager extends Application {
         });
     }
 
-    private void orderArticleTableColumns(String s) {
+    private void setColumnsOrder(String property) {
+        property = property.replaceAll("\\s", "");
         articlesTable.getColumns().clear();
-        String[] savedColumnIndexes = s.split(",");
+        String[] savedColumnIndexes = property.split(",");
         for (int i = 0; i < savedColumnIndexes.length; i++) {
-            articlesTable.getColumns().add(i, defaultColumns.get(Integer.parseInt(savedColumnIndexes[i])));
+            articlesTable.getColumns().add(i, defaultColumns.get(Integer.parseInt(savedColumnIndexes[i]) - 1));
         }
     }
 
@@ -594,13 +611,9 @@ public class WAManager extends Application {
         defaultColumns.addAll(articlesTable.getColumns());
     }
 
-    private void updateFilteredData() {
+    private void updateTableFilteredData() {
         filteredData.clear();
-        for (Article article : data) {
-            if (matchesFilter(article)) {
-                filteredData.add(article);
-            }
-        }
+        filteredData.addAll(data.stream().filter(this::matchesFilter).collect(Collectors.toList()));
         // Must re-sort table after items changed
         reapplyTableSortOrder();
     }
@@ -677,7 +690,11 @@ public class WAManager extends Application {
         exit.setMinWidth(60);
         exit.setOnAction(e -> {
             LOGGER.info("Saving columns view settings...");
-            writeColumnsOrderToFile();
+            try {
+                writeColumnsOrderToFile();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             LOGGER.info("Exiting...");
             window.close();
         });

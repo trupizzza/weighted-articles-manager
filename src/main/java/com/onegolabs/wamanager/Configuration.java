@@ -5,10 +5,7 @@ import com.onegolabs.wamanager.exception.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -91,5 +88,13 @@ public class Configuration {
 
 	public String getProperty(String key) {
 		return this.getCustom().getProperty(key);
+	}
+
+	public void store(FileWriter fileWriter, String comment) throws IOException {
+		getCustom().store(fileWriter, comment);
+	}
+
+	public void setProperty(String key, String value) {
+		getCustom().setProperty(key, value);
 	}
 }
