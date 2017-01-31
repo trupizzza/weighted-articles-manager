@@ -2,6 +2,7 @@ package com.onegolabs.wamanager.dao;
 
 import com.onegolabs.wamanager.model.Article;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -11,9 +12,7 @@ public interface ArticleDAO {
 
 	List<Article> getAllArticles();
 
-	Article getArticle(int rollNo);
+	Article getArticleByMaterialId(int matId);
 
-	void updateArticle(Article student);
-
-	void deleteArticle(Article student);
+	void updateArticleForCalculation(Article article) throws SQLException;
 }

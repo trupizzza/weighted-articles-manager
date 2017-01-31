@@ -7,30 +7,7 @@ import javafx.beans.property.*;
  */
 public class Article {
 
-	public Article(
-			int materialNumber,
-			String name,
-			String description,
-			double price,
-			boolean weighed,
-			int plu,
-			int expiryDaysCount,
-			String expiryDate,
-			int labelId,
-			int id) {
-		this.materialNumber = new SimpleIntegerProperty(materialNumber);
-		this.name = new SimpleStringProperty(name);
-		this.description = new SimpleStringProperty(description);
-		this.price = new SimpleDoubleProperty(price);
-		this.weighed = new SimpleBooleanProperty(weighed);
-		this.plu = new SimpleIntegerProperty(plu);
-		this.expiryDaysCount = new SimpleIntegerProperty(expiryDaysCount);
-		this.expiryDate = new SimpleStringProperty(expiryDate);
-		this.labelId = new SimpleIntegerProperty(labelId);
-		this.id = new SimpleIntegerProperty(id);
-	}
-
-	private IntegerProperty materialNumber;
+	private StringProperty materialNumber;
 	private StringProperty name;
 	private StringProperty description;
 	private DoubleProperty price;
@@ -42,22 +19,48 @@ public class Article {
 	private IntegerProperty id;
 
 	public Article(
-			int materialNumber, String name, String description, boolean weighed) {
-		this.materialNumber = new SimpleIntegerProperty(materialNumber);
+			String materialNumber,
+			String name,
+			String description,
+			double price,
+			boolean weighed,
+			int plu,
+			int expiryDaysCount,
+			String expiryDate,
+			int labelId,
+			int id) {
+		this.materialNumber = new SimpleStringProperty(materialNumber);
+		this.name = new SimpleStringProperty(name);
+		this.description = new SimpleStringProperty(description);
+		this.price = new SimpleDoubleProperty(price);
+		this.weighed = new SimpleBooleanProperty(weighed);
+		this.plu = new SimpleIntegerProperty(plu);
+		this.expiryDaysCount = new SimpleIntegerProperty(expiryDaysCount);
+		this.expiryDate = new SimpleStringProperty(expiryDate);
+		this.labelId = new SimpleIntegerProperty(labelId);
+		this.id = new SimpleIntegerProperty(id);
+	}
+
+	public Article(
+			String materialNumber, String name, String description, boolean weighed) {
+		this.materialNumber = new SimpleStringProperty(materialNumber);
 		this.name = new SimpleStringProperty(name);
 		this.description = new SimpleStringProperty(description);
 		this.weighed = new SimpleBooleanProperty(weighed);
 	}
 
-	public int getMaterialNumber() {
+	public Article() {
+	}
+
+	public String getMaterialNumber() {
 		return materialNumber.get();
 	}
 
-	public void setMaterialNumber(int materialNumber) {
+	public void setMaterialNumber(String materialNumber) {
 		this.materialNumber.set(materialNumber);
 	}
 
-	public IntegerProperty materialNumberProperty() {
+	public StringProperty materialNumberProperty() {
 		return materialNumber;
 	}
 

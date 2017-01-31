@@ -19,6 +19,9 @@ public class WamPreLoader extends Preloader {
 	@Override
 	public void start(Stage stage) {
 		try {
+			// TODO: initialize context here
+			// we need to load scales configuration, db connect string
+			// also view settings - list defines columns order in articles table
 			settings = new Configuration();
 			settings.init();
 			ConnectionManager connectionManager = new ConnectionManager();

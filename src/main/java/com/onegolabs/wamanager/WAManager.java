@@ -3,7 +3,6 @@ package com.onegolabs.wamanager;
 import com.onegolabs.Messages;
 import com.onegolabs.SimpleService;
 import com.onegolabs.wamanager.model.Article;
-import com.onegolabs.wamanager.view.TableColumnsConfigurationView;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -28,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author dmzhg
@@ -75,9 +72,11 @@ public class WAManager extends Application {
     private Menu viewMenu;
     private Menu helpMenu;
     private MenuItem aboutAppMenuItem;
-    private Map<Integer, TableColumn<Article, ?>> sortedColumns = new TreeMap<>();
 
-    private MenuItem configureColumnsMenuItem;
+    private MenuItem saveColumnsOrderMenuItem;
+    private ObservableList<? extends TableColumn<Article, ?>> currentColumnsOrder;
+    private ObservableList<TableColumn<Article, ?>> defaultColumns;
+
     public static void main(String[] args) {
         LauncherImpl.launchApplication(WAManager.class, WamPreLoader.class, args);
     }
@@ -131,24 +130,15 @@ public class WAManager extends Application {
         initValidUntilDatePicker();
         initMfrExpiryDateLabel();
         initMfrExpiryDatePicker();
-
         initBottomExpiryDatesPane();
         initBottomGridPaneElements();
-
-    }
-
-    public Map<Integer, TableColumn<Article, ?>> getSortedColumns() {
-        return sortedColumns;
     }
 
     private void initHelpMenu() {
         helpMenu = new Menu(Messages.getString("helpMenu"));
         aboutAppMenuItem = new MenuItem(Messages.getString("aboutApp"));
-        helpMenu.setOnAction(e -> {
-            showProgramInfo();
-        });
+        helpMenu.setOnAction(e -> showProgramInfo());
         helpMenu.getItems().add(aboutAppMenuItem);
-
     }
 
     private void showProgramInfo() {
@@ -177,11 +167,17 @@ public class WAManager extends Application {
 
     private void initViewMenu() {
         viewMenu = new Menu(Messages.getString("viewMenu"));
-        configureColumnsMenuItem = new MenuItem(Messages.getString("configureColumnsItem"));
-        viewMenu.getItems().add(configureColumnsMenuItem);
-        configureColumnsMenuItem.setOnAction(e -> {
-            TableColumnsConfigurationView view = new TableColumnsConfigurationView(getSortedColumns());
+        saveColumnsOrderMenuItem = new MenuItem(Messages.getString("saveColumnsOrderItem"));
+        viewMenu.getItems().add(saveColumnsOrderMenuItem);
+        viewMenu.getItems().add(new CheckMenuItem("CHECK ME!"));
+        saveColumnsOrderMenuItem.setOnAction(e -> {
+            // TODO: gogogogogogogog
         });
+    }
+
+    private void writeColumnsOrderToFile() {
+
+        // TODO: save sort order to file
     }
 
     private void initTopGridPane() {
@@ -375,7 +371,7 @@ public class WAManager extends Application {
         fullArticleDescriptionRowConstraints.setVgrow(Priority.ALWAYS);
 
         bottomGridPane.getColumnConstraints()
-                .addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
+                      .addAll(shortArticleDescriptionConstraints, fullArticleDescriptionConstraints);
         bottomGridPane.getRowConstraints().add(0, shortArticleDescriptionRowConstraints);
         bottomGridPane.getRowConstraints().add(1, fullArticleDescriptionRowConstraints);
 
@@ -497,10 +493,10 @@ public class WAManager extends Application {
         articlesTable = new TableView<>();
         articlesTable.setPlaceholder(new Label(Messages.getString("noContentInTable")));
         initArticlesTableColumns();
-
+        orderArticleTableColumns("1, 0, 2, 3, 4, 6, 5 ,7".replaceAll("\\s", ""));
 
         data = FXCollections.observableArrayList(new Article(
-                1,
+                "1",
                 "Мыло \"Черепашка\"",
                 "Волшебное мыло - вкусы \"Грифовая\", \"Трионикс\"",
                 500.0,
@@ -512,7 +508,7 @@ public class WAManager extends Application {
                 555));
 
         data.add(new Article(
-                1,
+                "559165",
                 "Бутылка водки",
                 "Гадость кислющая, но зачем-то же её пьют! Вот-таки странная то вещь творится на земле Русской!",
                 1200,
@@ -524,7 +520,7 @@ public class WAManager extends Application {
                 5));
 
         data.add(new Article(
-                1,
+                "555999",
                 "Жепь \"Ебрило\"",
                 "Щячло попячьться адинадин ОЛООлолОЛо Онотоле Негодуе!!!1!!один!!11",
                 0.45,
@@ -542,11 +538,24 @@ public class WAManager extends Application {
         articlesTable.setItems(filteredData);
         articlesTable.setVisible(true);
         articlesTable.setEditable(false);
+
         articlesTable.getSelectionModel().selectedItemProperty().addListener((observableValue, article, item) -> {
-            LOGGER.info(item.getName());
-            updateInformation(item);
+            // this check needed because this event also happens when drag'n'drop of table
+            // column happens - and in that case we got selected item = null
+            if (item != null) {
+                updateInformation(item);
+            }
         });
     }
+
+    private void orderArticleTableColumns(String s) {
+        articlesTable.getColumns().clear();
+        String[] savedColumnIndexes = s.split(",");
+        for (int i = 0; i < savedColumnIndexes.length; i++) {
+            articlesTable.getColumns().add(i, defaultColumns.get(Integer.parseInt(savedColumnIndexes[i])));
+        }
+    }
+
 
     private void initArticlesTableColumns() {
         TableColumn<Article, Integer> column_id = new TableColumn<>(Messages.getString("column_ID"));
@@ -561,7 +570,7 @@ public class WAManager extends Application {
         TableColumn<Article, Double> column_labelId = new TableColumn<>(Messages.getString("column_labelId"));
 
         column_weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
-                .weighedProperty());
+                                                                                                          .weighedProperty());
         column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         column_materialNumber.setCellValueFactory(new PropertyValueFactory<>("materialNumber"));
         column_description.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -581,20 +590,17 @@ public class WAManager extends Application {
                 column_price,
                 column_plu,
                 column_labelId);
-
-        // collect map of current sortedColumns to correct their order in settings
-        orderColumns();
+        defaultColumns = FXCollections.observableArrayList();
+        defaultColumns.addAll(articlesTable.getColumns());
     }
 
     private void updateFilteredData() {
         filteredData.clear();
-
         for (Article article : data) {
             if (matchesFilter(article)) {
                 filteredData.add(article);
             }
         }
-
         // Must re-sort table after items changed
         reapplyTableSortOrder();
     }
@@ -670,7 +676,9 @@ public class WAManager extends Application {
         exit.setMinHeight(60);
         exit.setMinWidth(60);
         exit.setOnAction(e -> {
-            System.out.println("Exit happened!");
+            LOGGER.info("Saving columns view settings...");
+            writeColumnsOrderToFile();
+            LOGGER.info("Exiting...");
             window.close();
         });
     }
@@ -708,10 +716,7 @@ public class WAManager extends Application {
         upload.setOnAction(e -> System.out.println("Upload happened!"));
     }
 
-    public void orderColumns() {
-        for (int i = 0; i < articlesTable.getColumns().size(); i++) {
-            TableColumn<Article, ?> column = articlesTable.getColumns().get(i);
-            sortedColumns.put(i, column);
-        }
+    public TableView<Article> getArticlesTable() {
+        return articlesTable;
     }
 }
