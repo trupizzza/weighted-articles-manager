@@ -1,11 +1,11 @@
-package com.onegolabs.scales.aclas;
+package com.onegolabs.wamanager.scales.aclas;
 
-import com.onegolabs.scales.ScalesCommandException;
-import com.onegolabs.scales.ScalesLoader;
+import com.onegolabs.wamanager.Configuration;
+import com.onegolabs.wamanager.exception.ScalesCommandCode;
+import com.onegolabs.wamanager.exception.ScalesCommandException;
+import com.onegolabs.wamanager.scales.ScalesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 /**
  * @author dmzhg
@@ -18,7 +18,7 @@ public class AclasLoader implements ScalesLoader {
 
     Logger LOGGER = LoggerFactory.getLogger(AclasLoader.class);
 
-    private Properties config;
+    private Configuration config;
     private int defaultUnit;
     private int defaultUnitPiece;
     private int defaultBarcode;
@@ -30,18 +30,17 @@ public class AclasLoader implements ScalesLoader {
     private int errno;
     private String errmsg;
 
-    public AclasLoader(Properties config) {
+    public AclasLoader(Configuration config) {
         this.config = config;
-        this.defaultUnit = Integer.parseInt(config.getProperty("unit"));
-        this.defaultUnitPiece = Integer.parseInt(config.getProperty("unitPiece"));
-        this.defaultBarcode = Integer.parseInt(config.getProperty("barcode"));
+        this.defaultUnit = Integer.parseInt(config.getScalesProperty("unit"));
+        this.defaultUnitPiece = Integer.parseInt(config.getScalesProperty("unitPiece"));
+        this.defaultBarcode = Integer.parseInt(config.getScalesProperty("barcode"));
         this.maxNameLength = 248;
         try {
-            maxNameLength = Integer.parseInt(config.getProperty("maxNameLength"));
+            maxNameLength = Integer.parseInt(config.getScalesProperty("maxNameLength"));
         } catch (Exception e) {
             LOGGER.error("Configuration error: failed to get property. " + e.getMessage(), e);
         }
-
         this.addr = 0L;
         this.hresult = 0L;
         this.errno = 0;
@@ -56,7 +55,9 @@ public class AclasLoader implements ScalesLoader {
     }
 
     public void connect() throws ScalesCommandException {
-
+        if (!connectToScales(config.getScalesProperty("address")) || addr == 0L) {
+            throw new ScalesCommandException(ScalesCommandCode.NO_CONNECTION_VIA_GIVEN_ADDRESS);
+        }
     }
 
     public void clearAll() throws ScalesCommandException {
@@ -71,7 +72,15 @@ public class AclasLoader implements ScalesLoader {
         return 0;
     }
 
-    public int uploadArticle(int plu, int code, String name, double price, int life, int msg, boolean hasToBeWeighted, int label) throws ScalesCommandException {
+    public int uploadArticle(
+            int plu,
+            int code,
+            String name,
+            double price,
+            int life,
+            int msg,
+            boolean hasToBeWeighted,
+            int label) throws ScalesCommandException {
         return 0;
     }
 
@@ -83,7 +92,7 @@ public class AclasLoader implements ScalesLoader {
 
     }
 
-    //    private void throwScalesException() throws ScalesCommandException {
+//    private void throwScalesException() throws ScalesCommandException {
 //        if (hresult != 0L) {
 //            throw new ScalesCommandException("OLE error " + hresult, ScalesConst.ERROR_OLE, hresult);
 //        } else if (errno != 0) {
@@ -92,7 +101,8 @@ public class AclasLoader implements ScalesLoader {
 //            throw new ScalesCommandException(ScalesConst.ERROR_UNKNOWN, 0L);
 //        }
 //    }
-//
+
+    //
 //    public int getMessageColumns() {
 //        int cols = 246;
 //        try {
@@ -111,22 +121,17 @@ public class AclasLoader implements ScalesLoader {
 //        return rows;
 //    }
 //
-//    private native boolean connectToScales(String address);
-//
-//    public void connect() throws ScalesCommandException {
-//        if (!connectToScales(config.getProperty("address")) || addr == 0L) {
-//            throwScalesException();
-//        }
-//    }
+    private native boolean connectToScales(String address);
 //
 //    public void beginUpload() throws ScalesCommandException {
 //        // This method has nothing to do
 //    }
 //
-//    private native int addMessage();
-//
-//    private native boolean setMessageLine(int line, String text);
-//
+private native int addMessage();
+
+    private native boolean setMessageLine(int line, String text);
+
+    //
 //    public int uploadMessage(String[] lines) throws ScalesCommandException {
 //        int messageNo = -1;
 //        if (lines.length > 0) {
@@ -145,9 +150,10 @@ public class AclasLoader implements ScalesLoader {
 //        return messageNo;
 //    }
 //
-//    private native int sendArticleToScales(int plu, int code, String name, double price, int life, int unit,
-//                                           int barcode, int message, int label);
-//
+    private native int sendArticleToScales(
+            int plu, int code, String name, double price, int life, int unit, int barcode, int message, int label);
+
+    //
 //    public int uploadArticle(int plu, int code, String name, double price, int life, int message,
 //                             boolean htbw, int label) throws ScalesCommandException {
 //
@@ -170,23 +176,25 @@ public class AclasLoader implements ScalesLoader {
 //        return articleNo;
 //    }
 //
-//    private native boolean flushBuffers();
-//
+    private native boolean flushBuffers();
+
+    //
 //    public void endUpload() throws ScalesCommandException {
 //        if (!flushBuffers()) {
 //            throwScalesException();
 //        }
 //    }
 //
-//    private native boolean clearAllPLUAndMessages();
-//
+    private native boolean clearAllPLUAndMessages();
+
+    //
 //    public void clearAll() throws ScalesCommandException {
 //        if (!clearAllPLUAndMessages()) {
 //            throwScalesException();
 //        }
 //    }
 //
-//    private native boolean disconnectFromScales();
+    private native boolean disconnectFromScales();
 //
 //    public void disconnect() throws ScalesCommandException {
 ////        if (!disconnectFromScales()) {

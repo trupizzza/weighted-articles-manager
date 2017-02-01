@@ -1,8 +1,12 @@
 package com.onegolabs.wamanager;
 
 import com.onegolabs.Messages;
-import com.onegolabs.SimpleService;
+import com.onegolabs.wamanager.context.Context;
+import com.onegolabs.wamanager.dbconnection.ConnectionFactory;
 import com.onegolabs.wamanager.model.Article;
+import com.onegolabs.wamanager.preloaders.WamInitPreLoader;
+import com.onegolabs.wamanager.task.SimpleService;
+import com.onegolabs.wamanager.task.UploadToScalesService;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,6 +32,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,7 +47,6 @@ import java.util.stream.Collectors;
 public class WAManager extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WAManager.class);
-
     private Button refresh;
     private SplitPane mainSplitPane;
     private BorderPane topBorderPane;
@@ -77,21 +84,20 @@ public class WAManager extends Application {
     private Menu viewMenu;
     private Menu helpMenu;
     private MenuItem aboutAppMenuItem;
-
     private MenuItem setDefaultColumnsOrderMenuItem;
     private ObservableList<? extends TableColumn<Article, ?>> currentColumnsOrder;
     private ObservableList<TableColumn<Article, ?>> defaultColumns;
 
     public static void main(String[] args) {
-        LauncherImpl.launchApplication(WAManager.class, WamPreLoader.class, args);
+        LauncherImpl.launchApplication(WAManager.class, WamInitPreLoader.class, args);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        settings = WamPreLoader.getConfiguration();
+        initContext();
+        LOGGER.info("Running version: " + Context.getContext().getVersion());
         window = primaryStage;
         initGUI();
-        window.show();
         window.setOnCloseRequest(event -> {
             LOGGER.info("Exiting...");
             try {
@@ -101,6 +107,29 @@ public class WAManager extends Application {
             }
             Platform.exit();
         });
+        window.show();
+    }
+
+    private void initContext() throws SQLException {
+        // init Settings
+        settings = new Configuration();
+        settings.init();
+        Context.getContext().setConfiguration(settings);
+
+        // test connection
+        testConnection();
+    }
+
+    private void testConnection() throws SQLException {
+        Connection connection = ConnectionFactory.getConnection();
+        Statement query = connection.createStatement();
+        ResultSet queryResult = query.executeQuery(" SELECT NAME, DESCRIPTION  FROM SHOPTREE WHERE GID = 0");
+
+        if (!queryResult.next()) {
+            throw new SQLException("errorBadDatabase");
+        }
+        Context.getContext().setShopName(queryResult.getString("NAME"));
+        Context.getContext().setShopDescription(queryResult.getString("DESCRIPTION"));
     }
 
     private void initGUI() {
@@ -573,7 +602,6 @@ public class WAManager extends Application {
         }
     }
 
-
     private void initArticlesTableColumns() {
         TableColumn<Article, Integer> column_id = new TableColumn<>(Messages.getString("column_ID"));
         TableColumn<Article, String> column_materialNumber = new TableColumn<>(Messages
@@ -730,10 +758,19 @@ public class WAManager extends Application {
         upload.setContentDisplay(ContentDisplay.TOP);
         upload.setMinHeight(60);
         upload.setMinWidth(60);
-        upload.setOnAction(e -> System.out.println("Upload happened!"));
+        upload.setOnAction(e -> {
+            LOGGER.info("Upload happened!");
+            UploadToScalesService service = new UploadToScalesService();
+            ProgressView progressView = new ProgressView();
+            service.setOnSucceeded(event -> progressView.getDialogStage().close());
+            progressView.activateProgressBar(service);
+            service.start();
+            service.setOnFailed(e1 -> progressView.getDialogStage().close());
+        });
     }
 
     public TableView<Article> getArticlesTable() {
         return articlesTable;
     }
+
 }

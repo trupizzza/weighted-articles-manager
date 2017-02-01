@@ -1,10 +1,9 @@
 package com.onegolabs.wamanager.dbconnection;
 
 import com.onegolabs.wamanager.Configuration;
+import com.onegolabs.wamanager.context.Context;
 import com.onegolabs.wamanager.exception.ConnectionCode;
 import com.onegolabs.wamanager.exception.InitializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,9 +11,7 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionFactory.class);
-
-	private static ConnectionFactory instance = new ConnectionFactory(new Configuration());
+	private static ConnectionFactory instance = new ConnectionFactory(Context.getContext().getConfiguration());
 
 	private Configuration config;
 

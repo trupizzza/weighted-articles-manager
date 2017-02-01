@@ -1,4 +1,4 @@
-package com.onegolabs;
+package com.onegolabs.wamanager.task;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

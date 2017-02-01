@@ -1,4 +1,4 @@
-package com.onegolabs.scales;
+package com.onegolabs.wamanager.scales;
 
 /**
  * @author dmzhg
