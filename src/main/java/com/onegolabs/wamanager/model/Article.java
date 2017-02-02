@@ -7,7 +7,7 @@ import javafx.beans.property.*;
  */
 public class Article {
 
-	private StringProperty materialNumber;
+	private IntegerProperty materialNumber;
 	private StringProperty name;
 	private StringProperty description;
 	private DoubleProperty price;
@@ -19,7 +19,7 @@ public class Article {
 	private IntegerProperty id;
 
 	public Article(
-			String materialNumber,
+			int materialNumber,
 			String name,
 			String description,
 			double price,
@@ -29,7 +29,7 @@ public class Article {
 			String expiryDate,
 			int labelId,
 			int id) {
-		this.materialNumber = new SimpleStringProperty(materialNumber);
+		this.materialNumber = new SimpleIntegerProperty(materialNumber);
 		this.name = new SimpleStringProperty(name);
 		this.description = new SimpleStringProperty(description);
 		this.price = new SimpleDoubleProperty(price);
@@ -42,8 +42,8 @@ public class Article {
 	}
 
 	public Article(
-			String materialNumber, String name, String description, boolean weighed) {
-		this.materialNumber = new SimpleStringProperty(materialNumber);
+			int materialNumber, String name, String description, boolean weighed) {
+		this.materialNumber = new SimpleIntegerProperty(materialNumber);
 		this.name = new SimpleStringProperty(name);
 		this.description = new SimpleStringProperty(description);
 		this.weighed = new SimpleBooleanProperty(weighed);
@@ -52,15 +52,15 @@ public class Article {
 	public Article() {
 	}
 
-	public String getMaterialNumber() {
+	public int getMaterialNumber() {
 		return materialNumber.get();
 	}
 
-	public void setMaterialNumber(String materialNumber) {
+	public void setMaterialNumber(int materialNumber) {
 		this.materialNumber.set(materialNumber);
 	}
 
-	public StringProperty materialNumberProperty() {
+	public IntegerProperty materialNumberProperty() {
 		return materialNumber;
 	}
 

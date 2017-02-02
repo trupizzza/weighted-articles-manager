@@ -2,7 +2,7 @@ package com.onegolabs.wamanager.scales.aclas;
 
 import com.onegolabs.wamanager.Configuration;
 import com.onegolabs.wamanager.exception.ScalesCommandCode;
-import com.onegolabs.wamanager.exception.ScalesCommandException;
+import com.onegolabs.wamanager.exception.scales.ScalesCommandException;
 import com.onegolabs.wamanager.scales.ScalesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +25,10 @@ public class AclasLoader implements ScalesLoader {
     private int maxNameLength;
 
     // The following fields are managed by the native DLL
-    private long addr;
-    private long hresult;
-    private int errno;
-    private String errmsg;
+    private long address;
+    private long result;
+    private int errorNumber;
+    private String errorMessage;
 
     public AclasLoader(Configuration config) {
         this.config = config;
@@ -41,9 +41,9 @@ public class AclasLoader implements ScalesLoader {
         } catch (Exception e) {
             LOGGER.error("Configuration error: failed to get property. " + e.getMessage(), e);
         }
-        this.addr = 0L;
-        this.hresult = 0L;
-        this.errno = 0;
+        this.address = 0L;
+        this.result = 0L;
+        this.errorNumber = 0;
     }
 
     public int getMessageColumns() {
@@ -55,17 +55,17 @@ public class AclasLoader implements ScalesLoader {
     }
 
     public void connect() throws ScalesCommandException {
-        if (!connectToScales(config.getScalesProperty("address")) || addr == 0L) {
+        LOGGER.debug("Trying to connect to scales...");
+        if (!connectToScales(config.getScalesProperty("address")) || address == 0L) {
             throw new ScalesCommandException(ScalesCommandCode.NO_CONNECTION_VIA_GIVEN_ADDRESS);
         }
+        LOGGER.debug("Connect successful!");
     }
 
     public void clearAll() throws ScalesCommandException {
-
     }
 
     public void beginUpload() throws ScalesCommandException {
-
     }
 
     public int uploadMessage(String[] lines) throws ScalesCommandException {
@@ -85,121 +85,23 @@ public class AclasLoader implements ScalesLoader {
     }
 
     public void endUpload() throws ScalesCommandException {
-
     }
 
     public void disconnect() throws ScalesCommandException {
-
     }
 
-//    private void throwScalesException() throws ScalesCommandException {
-//        if (hresult != 0L) {
-//            throw new ScalesCommandException("OLE error " + hresult, ScalesConst.ERROR_OLE, hresult);
-//        } else if (errno != 0) {
-//            throw new ScalesCommandException(errmsg, ScalesConst.ERROR_SCALES, errno);
-//        } else {
-//            throw new ScalesCommandException(ScalesConst.ERROR_UNKNOWN, 0L);
-//        }
-//    }
-
-    //
-//    public int getMessageColumns() {
-//        int cols = 246;
-//        try {
-//            cols = Integer.parseInt(config.getProperty("labelCols"));
-//        } catch (Exception e) {
-//        }
-//        return cols;
-//    }
-//
-//    public int getMessageRows() {
-//        int rows = 16;
-//        try {
-//            rows = Integer.parseInt(config.getProperty("labelRows"));
-//        } catch (Exception e) {
-//        }
-//        return rows;
-//    }
-//
     private native boolean connectToScales(String address);
-//
-//    public void beginUpload() throws ScalesCommandException {
-//        // This method has nothing to do
-//    }
-//
-private native int addMessage();
+
+    private native int addMessage();
 
     private native boolean setMessageLine(int line, String text);
 
-    //
-//    public int uploadMessage(String[] lines) throws ScalesCommandException {
-//        int messageNo = -1;
-//        if (lines.length > 0) {
-//            messageNo = addMessage();
-//            if (messageNo < 1) {
-//                throwScalesException();
-//            }
-//
-//            int i = 1;
-//            for (String line : lines) {
-//                if (!setMessageLine(i++, line)) {
-//                    throwScalesException();
-//                }
-//            }
-//        }
-//        return messageNo;
-//    }
-//
     private native int sendArticleToScales(
             int plu, int code, String name, double price, int life, int unit, int barcode, int message, int label);
 
-    //
-//    public int uploadArticle(int plu, int code, String name, double price, int life, int message,
-//                             boolean htbw, int label) throws ScalesCommandException {
-//
-//        if (maxNameLength > 0 && name.length() > maxNameLength) {
-//            name = name.substring(0, maxNameLength - 1);
-//        }
-//
-//        int articleNo =
-//                sendArticleToScales(plu, code, name, price, life, (htbw ? defaultUnit : defaultUnitPiece),
-//                        defaultBarcode, message, label);
-//
-//        if (articleNo < 1) {
-//            // throwScalesException();
-//            throw new ScalesCommandException("Could not upload article: "
-//                    + "plu=" + plu + ", code=" + code + ", name=" + name + ", price="
-//                    + price + ", life=" + life + ", label = " + label + ", htbw="
-//                    + htbw + ", errno=" + errno + ", errmsg=" + errmsg);
-//        }
-//
-//        return articleNo;
-//    }
-//
     private native boolean flushBuffers();
 
-    //
-//    public void endUpload() throws ScalesCommandException {
-//        if (!flushBuffers()) {
-//            throwScalesException();
-//        }
-//    }
-//
     private native boolean clearAllPLUAndMessages();
 
-    //
-//    public void clearAll() throws ScalesCommandException {
-//        if (!clearAllPLUAndMessages()) {
-//            throwScalesException();
-//        }
-//    }
-//
     private native boolean disconnectFromScales();
-//
-//    public void disconnect() throws ScalesCommandException {
-////        if (!disconnectFromScales()) {
-////            throwScalesException();
-////        }
-////        addr = 0L;
-//    }
 }

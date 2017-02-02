@@ -541,7 +541,7 @@ public class WAManager extends Application {
         setColumnsOrder(settings.getProperty("columnsOrder"));
 
         data = FXCollections.observableArrayList(new Article(
-                "1",
+                1,
                 "Мыло \"Черепашка\"",
                 "Волшебное мыло - вкусы \"Грифовая\", \"Трионикс\"",
                 500.0,
@@ -553,7 +553,7 @@ public class WAManager extends Application {
                 555));
 
         data.add(new Article(
-                "559165",
+                559165,
                 "Бутылка водки",
                 "Гадость кислющая, но зачем-то же её пьют! Вот-таки странная то вещь творится на земле Русской!",
                 1200,
@@ -565,7 +565,7 @@ public class WAManager extends Application {
                 5));
 
         data.add(new Article(
-                "555999",
+                555999,
                 "Жепь \"Ебрило\"",
                 "Щячло попячьться адинадин ОЛООлолОЛо Онотоле Негодуе!!!1!!один!!11",
                 0.45,

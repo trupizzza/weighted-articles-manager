@@ -2,7 +2,6 @@ package com.onegolabs.wamanager.task;
 
 import com.onegolabs.Messages;
 import com.onegolabs.wamanager.context.Context;
-import com.onegolabs.wamanager.exception.UploadingException;
 import com.onegolabs.wamanager.scales.ScalesLoader;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class UploadToScalesTask extends Task<Void> {
         loader.beginUpload();
         loader.clearAll();
         updateMessage(Messages.getString("status.uploading"));
-       // loadArticles();
+        loadArticles();
         updateProgress(100, 100);
         updateMessage(Messages.getString("status.finishing"));
         loader.endUpload();
@@ -39,46 +38,15 @@ public class UploadToScalesTask extends Task<Void> {
         return null;
     }
 
-//    private void loadArticles() {
-//        for (int i = 0; i < editor.validArticles.size(); i++) {
-//
-//            int msg = 0;
-//
-//            Article article = editor.validArticles.get(i);
-//            String messageText = article.getDescription() != null ? article.getDescription() : "";
-//
-//            String[] messageLines = getWrappedText(messageText, loader);
-//            if (messageLines != null) {
-//                msg = loader.uploadMessage(messageLines);
-//            }
-//            int label = article.getLabelId();
-//            int plu = article.getPlu();
-//            int code = article.getMaterialNumber();
-//            String name = article.getName();
-//            double price = article.getPrice();
-//            int life = article.getExpDaysToScale();
-//            boolean htbw = article.getWeighed();
-//            int discount = article.getDiscount();
-//
-//            loader.uploadArticle(plu, code, name, price, life, msg, htbw, label, discount);
-//            updateProgress(i, editor.validArticles.size());
-//        }
-//    }
+    private void loadArticles() {
+    }
 
     @Override
     protected void failed() {
-        LOGGER.info("Error during downloading!");
-        throw UploadingException.wrap(this.getException());
     }
 
     @Override
     protected void succeeded() {
-        String resourceString = Messages.getString("status.finished");
-        LOGGER.info(resourceString);
-//        if (getContext().isSilentModeOn()) {
-//            LOGGER.info("Uploading in silent mode is done!");
-//            System.exit(0);
-//        }
     }
 
     private String[] getWrappedText(String txt, ScalesLoader loader) {

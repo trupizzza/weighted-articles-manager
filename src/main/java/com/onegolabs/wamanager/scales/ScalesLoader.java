@@ -1,5 +1,7 @@
 package com.onegolabs.wamanager.scales;
 
+import com.onegolabs.wamanager.exception.scales.ScalesCommandException;
+
 /**
  * @author dmzhg
  */
