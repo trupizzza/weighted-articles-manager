@@ -1,6 +1,6 @@
 package com.onegolabs.wamanager;
 
-import com.onegolabs.Messages;
+import com.onegolabs.resources.Messages;
 import com.onegolabs.wamanager.context.Context;
 import com.onegolabs.wamanager.dbconnection.ConnectionFactory;
 import com.onegolabs.wamanager.model.Article;

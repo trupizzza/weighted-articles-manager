@@ -1,4 +1,4 @@
-import com.onegolabs.Messages;
+import com.onegolabs.resources.Messages;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

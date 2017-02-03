@@ -1,4 +1,4 @@
-import com.onegolabs.Messages;
+import com.onegolabs.resources.Messages;
 import com.onegolabs.wamanager.Configuration;
 import com.onegolabs.wamanager.exception.InitializationException;
 import org.junit.Rule;

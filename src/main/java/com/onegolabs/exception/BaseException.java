@@ -1,6 +1,7 @@
-package com.onegolabs.wamanager.exception;
+package com.onegolabs.exception;
 
-import com.onegolabs.Messages;
+import com.onegolabs.resources.Messages;
+import com.onegolabs.wamanager.exception.ErrorCode;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;

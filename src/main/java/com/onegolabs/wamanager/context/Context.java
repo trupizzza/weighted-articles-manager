@@ -1,6 +1,6 @@
 package com.onegolabs.wamanager.context;
 
-import com.onegolabs.Messages;
+import com.onegolabs.resources.Messages;
 import com.onegolabs.wamanager.Configuration;
 import com.onegolabs.wamanager.scales.ScalesLoader;
 import com.onegolabs.wamanager.scales.ScalesLoaderFactory;

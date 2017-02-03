@@ -1,6 +1,6 @@
 package com.onegolabs.wamanager.exception.scales;
 
-import com.onegolabs.wamanager.exception.BaseException;
+import com.onegolabs.exception.BaseException;
 import com.onegolabs.wamanager.exception.ErrorCode;
 
 /**

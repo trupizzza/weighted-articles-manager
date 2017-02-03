@@ -20,7 +20,11 @@ public interface ScalesLoader {
     int uploadMessage(String[] lines) throws ScalesCommandException;
 
     int uploadArticle(int plu, int code, String name, double price,
-                      int life, int msg, boolean hasToBeWeighted, int label)
+            int life,
+            int msg,
+            boolean hasToBeWeighted,
+            int label,
+            int discount)
             throws ScalesCommandException;
 
     void endUpload() throws ScalesCommandException;

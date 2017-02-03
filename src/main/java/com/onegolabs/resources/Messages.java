@@ -1,4 +1,4 @@
-package com.onegolabs;
+package com.onegolabs.resources;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -13,6 +13,11 @@ public class Messages {
 
 	public static String getString(String key) {
 		return r.getString(key);
+	}
+
+	public static String getExceptionString(String key) {
+		return "";
+//		return exR.getString(key);
 	}
 
 //	public static String getExceptionText(ErrorCode code) {

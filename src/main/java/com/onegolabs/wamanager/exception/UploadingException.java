@@ -1,5 +1,7 @@
 package com.onegolabs.wamanager.exception;
 
+import com.onegolabs.exception.BaseException;
+
 /**
  * @author dmzhg
  */
