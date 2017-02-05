@@ -18,6 +18,12 @@ public class Article {
     private IntegerProperty labelId;
     private IntegerProperty id;
     private IntegerProperty discount;
+    private BooleanProperty morePrices;
+    private IntegerProperty lifeBoxTotal;
+    private StringProperty manufacturerExpiryDate;
+    private IntegerProperty addNo1;
+    private StringProperty expiryDateShop;
+    private IntegerProperty expDaysToScale;
 
     public Article(
             int materialNumber,
@@ -51,6 +57,62 @@ public class Article {
     }
 
     public Article() {
+    }
+
+    public String getExpiryDateShop() {
+        return expiryDateShop.get();
+    }
+
+    public void setExpiryDateShop(String expiryDateShop) {
+        this.expiryDateShop.set(expiryDateShop);
+    }
+
+    public StringProperty expiryDateShopProperty() {
+        return expiryDateShop;
+    }
+
+    public int getExpDaysToScale() {
+        return expDaysToScale.get();
+    }
+
+    public void setExpDaysToScale(int expDaysToScale) {
+        this.expDaysToScale.set(expDaysToScale);
+    }
+
+    public IntegerProperty expDaysToScaleProperty() {
+        return expDaysToScale;
+    }
+
+    public int getAddNo1() {
+        return addNo1.get();
+    }
+
+    public void setAddNo1(int addNo1) {
+        this.addNo1.set(addNo1);
+    }
+
+    public IntegerProperty addNo1Property() {
+        return addNo1;
+    }
+
+    public String getManufacturerExpiryDate() {
+        return manufacturerExpiryDate.get();
+    }
+
+    public void setManufacturerExpiryDate(String manufacturerExpiryDate) {
+        this.manufacturerExpiryDate.set(manufacturerExpiryDate);
+    }
+
+    public StringProperty manufacturerExpiryDateProperty() {
+        return manufacturerExpiryDate;
+    }
+
+    public int getLifeBoxTotal() {
+        return lifeBoxTotal.get();
+    }
+
+    public void setLifeBoxTotal(int lifeBoxTotal) {
+        this.lifeBoxTotal.set(lifeBoxTotal);
     }
 
     public int getMaterialNumber() {
@@ -179,5 +241,21 @@ public class Article {
 
     public void setDiscount(int discount) {
         this.discount.set(discount);
+    }
+
+    public IntegerProperty discountProperty() {
+        return discount;
+    }
+
+    public boolean getMorePrices() {
+        return morePrices.get();
+    }
+
+    public void setMorePrices(boolean morePrices) {
+        this.morePrices.set(morePrices);
+    }
+
+    public BooleanProperty morePricesProperty() {
+        return morePrices;
     }
 }

@@ -226,4 +226,4 @@ FROM
     ON MAT.WGID         = WG.GID
     WHERE MAT.SCALEPLU IS NOT NULL
     AND MAT.STATUS      = 'A'
-    AND MAT.DNYUSE      = 'N'
+    AND MAT.DNYUSE      = 'N'))

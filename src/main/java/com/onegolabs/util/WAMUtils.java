@@ -1,5 +1,7 @@
 package com.onegolabs.util;
 
+import com.onegolabs.wamanager.exception.SystemCode;
+import com.onegolabs.wamanager.exception.SystemException;
 import com.onegolabs.wamanager.scales.ScalesLoader;
 
 import java.net.InetAddress;
@@ -110,5 +112,16 @@ public class WAMUtils {
 
         String[] linesArr = new String[lines.size()];
         return lines.toArray(linesArr);
+    }
+
+    public static boolean getBooleanFlagValue(String flag) {
+        switch (flag) {
+            case "Y":
+                return true;
+            case "N":
+                return false;
+            default:
+                throw new SystemException(SystemCode.BAD_VALUE).set("Flag", flag);
+        }
     }
 }

@@ -2,6 +2,8 @@ package com.onegolabs.wamanager;
 
 import com.onegolabs.resources.Messages;
 import com.onegolabs.wamanager.context.Context;
+import com.onegolabs.wamanager.dao.ArticleDAO;
+import com.onegolabs.wamanager.dao.impl.ArticleDAOImpl;
 import com.onegolabs.wamanager.dbconnection.ConnectionFactory;
 import com.onegolabs.wamanager.model.Article;
 import com.onegolabs.wamanager.preloaders.WamInitPreLoader;
@@ -78,7 +80,7 @@ public class WAManager extends Application {
     private GridPane bottomExpiryDatesPane;
     private StringConverter<LocalDate> dateConverter;
     private Callback<DatePicker, DateCell> cellFactory;
-    private ObservableList<Article> data;
+    private ObservableList<Article> tableData;
     private ObservableList<Article> filteredData;
     private MenuBar topMenu;
     private Menu viewMenu;
@@ -539,46 +541,11 @@ public class WAManager extends Application {
         articlesTable.setPlaceholder(new Label(Messages.getString("noContentInTable")));
         initArticlesTableColumns();
         setColumnsOrder(settings.getProperty("columnsOrder"));
-
-        data = FXCollections.observableArrayList(new Article(
-                1,
-                "Мыло \"Черепашка\"",
-                "Волшебное мыло - вкусы \"Грифовая\", \"Трионикс\"",
-                500.0,
-                true,
-                123,
-                123,
-                "22.12.2012",
-                666,
-                555));
-
-        data.add(new Article(
-                559165,
-                "Бутылка водки",
-                "Гадость кислющая, но зачем-то же её пьют! Вот-таки странная то вещь творится на земле Русской!",
-                1200,
-                false,
-                123,
-                123,
-                "01.01.2017",
-                6,
-                5));
-
-        data.add(new Article(
-                555999,
-                "Жепь \"Ебрило\"",
-                "Щячло попячьться адинадин ОЛООлолОЛо Онотоле Негодуе!!!1!!один!!11",
-                0.45,
-                true,
-                1223,
-                13,
-                "01.01.2016",
-                1,
-                2));
-        data.addListener((ListChangeListener<Article>) change -> updateTableFilteredData());
+        loadArticles();
+        tableData.addListener((ListChangeListener<Article>) change -> updateTableFilteredData());
 
         filteredData = FXCollections.observableArrayList();
-        filteredData.addAll(data);
+        filteredData.addAll(tableData);
 
         articlesTable.setItems(filteredData);
         articlesTable.setVisible(true);
@@ -593,6 +560,15 @@ public class WAManager extends Application {
         });
     }
 
+    private void loadArticles() {
+        ArticleDAO dao = new ArticleDAOImpl();
+        try {
+            tableData.addAll(dao.getAllArticles());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setColumnsOrder(String property) {
         property = property.replaceAll("\\s", "");
         articlesTable.getColumns().clear();
@@ -604,11 +580,11 @@ public class WAManager extends Application {
 
     private void initArticlesTableColumns() {
         TableColumn<Article, Integer> column_id = new TableColumn<>(Messages.getString("column_ID"));
-        TableColumn<Article, String> column_materialNumber = new TableColumn<>(Messages
-                .getString("column_materialNumber"));
+        TableColumn<Article, String> column_materialNumber = new TableColumn<>(Messages.getString(
+                "column_materialNumber"));
         TableColumn<Article, String> column_name = new TableColumn<>(Messages.getString("column_name"));
-        TableColumn<Article, String> column_description = new TableColumn<>(Messages
-                .getString("column_materialDescription"));
+        TableColumn<Article, String> column_description = new TableColumn<>(Messages.getString(
+                "column_materialDescription"));
         TableColumn<Article, Boolean> column_weighed = new TableColumn<>(Messages.getString("column_weighed"));
         TableColumn<Article, Double> column_price = new TableColumn<>(Messages.getString("column_price"));
         TableColumn<Article, Integer> column_plu = new TableColumn<>(Messages.getString("column_plu"));
@@ -641,7 +617,7 @@ public class WAManager extends Application {
 
     private void updateTableFilteredData() {
         filteredData.clear();
-        filteredData.addAll(data.stream().filter(this::matchesFilter).collect(Collectors.toList()));
+        filteredData.addAll(tableData.stream().filter(this::matchesFilter).collect(Collectors.toList()));
         // Must re-sort table after items changed
         reapplyTableSortOrder();
     }
@@ -682,8 +658,8 @@ public class WAManager extends Application {
         adjustVisibilityAndSize(article);
         fullArticleDescription.setText(article.getDescription());
         shortArticleDescription.setText(article.getName());
-        validUntilDatePicker
-                .setValue(LocalDate.parse(article.getExpiryDate(), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        validUntilDatePicker.setValue(LocalDate.parse(article.getExpiryDate(),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 
     private void adjustVisibilityAndSize(Article article) {

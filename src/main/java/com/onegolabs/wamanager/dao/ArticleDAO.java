@@ -10,9 +10,9 @@ import java.util.List;
  */
 public interface ArticleDAO {
 
-	List<Article> getAllArticles();
+    List<Article> getAllArticles() throws SQLException;
 
-	Article getArticleByMaterialId(int matId);
+    Article getArticleByMaterialId(int matId);
 
-	void updateArticleForCalculation(Article article) throws SQLException;
+    void updateArticleForCalculation(Article article) throws SQLException;
 }
