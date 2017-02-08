@@ -170,7 +170,7 @@ public class AclasLoader implements ScalesLoader {
     private void throwScalesCommandException() throws ScalesCommandException {
         BaseException e = new ScalesCommandException();
         if (result != 0L) {
-            e = e.set("result", Messages.getExceptionString("win.error." + WAMUtils.decToHex((int) result)))
+            e = e.set("result", Messages.getExceptionText("win.error." + WAMUtils.decToHex((int) result)))
                  .set("OLE ERROR", result);
         } else if (errorNumber != 0) {
             e = e.set("errorMessage", errorMessage).set("errorNumber", errorNumber);

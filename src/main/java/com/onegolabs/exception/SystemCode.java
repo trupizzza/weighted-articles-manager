@@ -11,7 +11,7 @@ public enum SystemCode implements ErrorCode {
     ERROR_WHILE_READING_FILE(1),
     ERROR_WHILE_CLOSING_FILE_INPUT_STREAM(2),
     QUERY_NAME_CANT_BE_NULL(3), BAD_VALUE(4),
-    ERROR_WHILE_WRITING_FILE(5);
+    ERROR_WHILE_WRITING_FILE(5), TEST(99);
 
     private final int code;
 
@@ -22,10 +22,5 @@ public enum SystemCode implements ErrorCode {
     @Override
     public int getCode() {
         return code;
-    }
-
-    @Override
-    public String toString() {
-        return "Code" + ": " + code;
     }
 }

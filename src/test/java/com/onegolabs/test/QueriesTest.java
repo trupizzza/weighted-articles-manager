@@ -1,4 +1,4 @@
-package queries;
+package com.onegolabs.test;
 
 import com.onegolabs.exception.SystemException;
 import com.onegolabs.resources.Queries;

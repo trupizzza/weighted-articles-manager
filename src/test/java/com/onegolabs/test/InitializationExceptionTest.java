@@ -1,5 +1,5 @@
-import com.onegolabs.resources.Messages;
-import com.onegolabs.wamanager.Configuration;
+package com.onegolabs.test;
+
 import com.onegolabs.wamanager.exception.InitializationException;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,19 +12,11 @@ public class InitializationExceptionTest {
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	private Configuration config = new Configuration();
 
 	@Test
 	public void exceptionHappening() throws InitializationException {
 		thrown.expect(InitializationException.class);
 		throw new InitializationException();
-	}
-
-	@Test
-	public void configFileNotFoundInitializationException() throws InitializationException {
-		thrown.expect(InitializationException.class);
-		thrown.expectMessage(Messages.getString("configFileNotFound"));
-		config.init();
 	}
 
 	@Test

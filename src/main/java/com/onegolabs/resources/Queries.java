@@ -24,10 +24,11 @@ public class Queries {
         if (name == null) {
             throw new SystemException(SystemCode.QUERY_NAME_CANT_BE_NULL);
         }
-        // gets folder "${PROJECT}/queries/"
+        // gets folder "${PROJECT}/com.onegolabs.test.queries/"
         final File queriesDir = new File("queries");
         if (queriesDir.listFiles() == null) {
-            throw new MissingResourceException("No queries found in given folder",
+            throw new MissingResourceException(
+                    "No com.onegolabs.test.queries found in given folder",
                     Queries.class.toString(),
                     queriesDir.getAbsolutePath());
         }
