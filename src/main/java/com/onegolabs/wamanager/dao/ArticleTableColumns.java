@@ -5,9 +5,9 @@ package com.onegolabs.wamanager.dao;
  */
 public class ArticleTableColumns {
     public final static int MATNO = 1;
-    public final static int MATDSC = 2;
-    public final static int MATNAM = 3;
-    public static int PRICE = 4;
+    public final static int MATNAM = 2;
+    public final static int MATDSC = 3;
+    public final static int PRICE = 4;
     public final static int HASTOBEWEIGHTED = 5;
     public final static int SCALEPLU = 6;
     public final static int EXPDATSHOP = 7;

@@ -13,7 +13,7 @@ public class Article {
     private DoubleProperty price;
     private BooleanProperty weighed;
     private IntegerProperty plu;
-    private IntegerProperty expiryDaysCount;
+    private IntegerProperty scaleExpiryDays;
     private StringProperty expiryDate;
     private IntegerProperty labelId;
     private IntegerProperty id;
@@ -31,8 +31,7 @@ public class Article {
             String description,
             double price,
             boolean weighed,
-            int plu,
-            int expiryDaysCount,
+            int plu, int scaleExpiryDays,
             String expiryDate,
             int labelId,
             int id) {
@@ -42,7 +41,7 @@ public class Article {
         this.price = new SimpleDoubleProperty(price);
         this.weighed = new SimpleBooleanProperty(weighed);
         this.plu = new SimpleIntegerProperty(plu);
-        this.expiryDaysCount = new SimpleIntegerProperty(expiryDaysCount);
+        this.scaleExpiryDays = new SimpleIntegerProperty(scaleExpiryDays);
         this.expiryDate = new SimpleStringProperty(expiryDate);
         this.labelId = new SimpleIntegerProperty(labelId);
         this.id = new SimpleIntegerProperty(id);
@@ -57,6 +56,23 @@ public class Article {
     }
 
     public Article() {
+        this.materialNumber = new SimpleIntegerProperty();
+        this.name = new SimpleStringProperty();
+        this.description = new SimpleStringProperty();
+        this.price = new SimpleDoubleProperty();
+        this.weighed = new SimpleBooleanProperty();
+        this.plu = new SimpleIntegerProperty();
+        this.scaleExpiryDays = new SimpleIntegerProperty();
+        this.expiryDate = new SimpleStringProperty();
+        this.labelId = new SimpleIntegerProperty();
+        this.id = new SimpleIntegerProperty();
+        this.morePrices = new SimpleBooleanProperty();
+        this.manufacturerExpiryDate = new SimpleStringProperty();
+        this.expiryDateShop = new SimpleStringProperty();
+        this.addNo1 = new SimpleIntegerProperty();
+        this.lifeBoxTotal = new SimpleIntegerProperty();
+        this.expDaysToScale = new SimpleIntegerProperty();
+        this.discount = new SimpleIntegerProperty();
     }
 
     public String getExpiryDateShop() {
@@ -187,16 +203,16 @@ public class Article {
         return plu;
     }
 
-    public int getExpiryDaysCount() {
-        return expiryDaysCount.get();
+    public int getScaleExpiryDays() {
+        return scaleExpiryDays.get();
     }
 
-    public void setExpiryDaysCount(int expiryDaysCount) {
-        this.expiryDaysCount.set(expiryDaysCount);
+    public void setScaleExpiryDays(int scaleExpiryDays) {
+        this.scaleExpiryDays.set(scaleExpiryDays);
     }
 
-    public IntegerProperty expiryDaysCountProperty() {
-        return expiryDaysCount;
+    public IntegerProperty scaleExpiryDaysProperty() {
+        return scaleExpiryDays;
     }
 
     public String getExpiryDate() {

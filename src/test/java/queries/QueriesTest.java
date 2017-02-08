@@ -1,7 +1,7 @@
 package queries;
 
+import com.onegolabs.exception.SystemException;
 import com.onegolabs.resources.Queries;
-import com.onegolabs.wamanager.exception.SystemException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

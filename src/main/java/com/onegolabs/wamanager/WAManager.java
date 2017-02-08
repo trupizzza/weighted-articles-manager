@@ -1,5 +1,9 @@
 package com.onegolabs.wamanager;
 
+import com.onegolabs.exception.DAOCode;
+import com.onegolabs.exception.DAOException;
+import com.onegolabs.exception.SystemCode;
+import com.onegolabs.exception.SystemException;
 import com.onegolabs.resources.Messages;
 import com.onegolabs.wamanager.context.Context;
 import com.onegolabs.wamanager.dao.ArticleDAO;
@@ -7,7 +11,6 @@ import com.onegolabs.wamanager.dao.impl.ArticleDAOImpl;
 import com.onegolabs.wamanager.dbconnection.ConnectionFactory;
 import com.onegolabs.wamanager.model.Article;
 import com.onegolabs.wamanager.preloaders.WamInitPreLoader;
-import com.onegolabs.wamanager.task.SimpleService;
 import com.onegolabs.wamanager.task.UploadToScalesService;
 import com.sun.javafx.application.LauncherImpl;
 import javafx.application.Application;
@@ -80,7 +83,7 @@ public class WAManager extends Application {
     private GridPane bottomExpiryDatesPane;
     private StringConverter<LocalDate> dateConverter;
     private Callback<DatePicker, DateCell> cellFactory;
-    private ObservableList<Article> tableData;
+    private ObservableList<Article> tableData = FXCollections.observableArrayList();
     private ObservableList<Article> filteredData;
     private MenuBar topMenu;
     private Menu viewMenu;
@@ -101,12 +104,8 @@ public class WAManager extends Application {
         window = primaryStage;
         initGUI();
         window.setOnCloseRequest(event -> {
+            writeColumnsOrderToFile();
             LOGGER.info("Exiting...");
-            try {
-                writeColumnsOrderToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             Platform.exit();
         });
         window.show();
@@ -220,11 +219,17 @@ public class WAManager extends Application {
         });
     }
 
-    private void writeColumnsOrderToFile() throws IOException {
-        settings.setProperty("columnsOrder", "1,2,3,4,5,6,7");
+    private void writeColumnsOrderToFile() {
+        LOGGER.info("Saving columns view settings...");
+        settings.setProperty("columnsOrder", "1,2,3,4,5,6,7,8,9,10,11,12");
         File configFile = new File("config.properties");
-        FileWriter writer = new FileWriter(configFile);
-        settings.store(writer, "Customer settings");
+        FileWriter writer;
+        try {
+            writer = new FileWriter(configFile);
+            settings.store(writer, "Customer settings");
+        } catch (IOException e) {
+            throw SystemException.wrap(e, SystemCode.ERROR_WHILE_WRITING_FILE);
+        }
     }
 
     private void initTopGridPane() {
@@ -563,9 +568,10 @@ public class WAManager extends Application {
     private void loadArticles() {
         ArticleDAO dao = new ArticleDAOImpl();
         try {
+            tableData.clear();
             tableData.addAll(dao.getAllArticles());
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw DAOException.wrap(e, DAOCode.SQL_ERROR);
         }
     }
 
@@ -589,6 +595,12 @@ public class WAManager extends Application {
         TableColumn<Article, Double> column_price = new TableColumn<>(Messages.getString("column_price"));
         TableColumn<Article, Integer> column_plu = new TableColumn<>(Messages.getString("column_plu"));
         TableColumn<Article, Double> column_labelId = new TableColumn<>(Messages.getString("column_labelId"));
+        TableColumn<Article, Integer> column_lifeBoxTotal = new TableColumn<>(Messages.getString("column_lifeBoxTotal"));
+        TableColumn<Article, String> column_expiryDate = new TableColumn<>(Messages.getString("column_expiryDate"));
+        TableColumn<Article, String> column_scaleExpiryDays = new TableColumn<>(Messages.getString(
+                "column_scaleExpiryDays"));
+        TableColumn<Article, String> column_expiryDateShop = new TableColumn<>(Messages.getString(
+                "column_expiryDateShop"));
 
         column_weighed.setCellValueFactory((TableColumn.CellDataFeatures<Article, Boolean> param) -> param.getValue()
                                                                                                           .weighedProperty());
@@ -601,16 +613,24 @@ public class WAManager extends Application {
         column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         column_plu.setCellValueFactory(new PropertyValueFactory<>("plu"));
         column_labelId.setCellValueFactory(new PropertyValueFactory<>("labelId"));
+        column_lifeBoxTotal.setCellValueFactory(new PropertyValueFactory<>("lifeBoxTotal"));
+        column_expiryDate.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
+        column_scaleExpiryDays.setCellValueFactory(new PropertyValueFactory<>("scaleExpiryDays"));
+        column_expiryDateShop.setCellValueFactory(new PropertyValueFactory<>("expiryDateShop"));
 
-        articlesTable.getColumns().addAll(
-                column_id,
+        articlesTable.getColumns().addAll(column_id,
                 column_materialNumber,
                 column_name,
                 column_description,
                 column_weighed,
                 column_price,
                 column_plu,
-                column_labelId);
+                column_labelId,
+                column_lifeBoxTotal,
+                column_expiryDate,
+                column_scaleExpiryDays,
+                column_expiryDateShop);
+
         defaultColumns = FXCollections.observableArrayList();
         defaultColumns.addAll(articlesTable.getColumns());
     }
@@ -658,8 +678,8 @@ public class WAManager extends Application {
         adjustVisibilityAndSize(article);
         fullArticleDescription.setText(article.getDescription());
         shortArticleDescription.setText(article.getName());
-        validUntilDatePicker.setValue(LocalDate.parse(article.getExpiryDate(),
-                DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        validUntilDatePicker.setValue(article.getExpiryDate() != null ? LocalDate.parse(article.getExpiryDate(),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy")) : null);
     }
 
     private void adjustVisibilityAndSize(Article article) {
@@ -693,14 +713,9 @@ public class WAManager extends Application {
         exit.setMinHeight(60);
         exit.setMinWidth(60);
         exit.setOnAction(e -> {
-            LOGGER.info("Saving columns view settings...");
-            try {
-                writeColumnsOrderToFile();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            writeColumnsOrderToFile();
             LOGGER.info("Exiting...");
-            window.close();
+            Platform.exit();
         });
     }
 
@@ -714,14 +729,7 @@ public class WAManager extends Application {
         refresh.setContentDisplay(ContentDisplay.TOP);
         refresh.setMinHeight(60);
         refresh.setMinWidth(60);
-        refresh.setOnAction(e -> {
-            LOGGER.info("Refresh happened!");
-            SimpleService service = new SimpleService();
-            ProgressView progressView = new ProgressView();
-            service.setOnSucceeded(event -> progressView.getDialogStage().close());
-            progressView.activateProgressBar(service);
-            service.start();
-        });
+        refresh.setOnAction(e -> loadArticles());
     }
 
     private void initUploadButton() {
@@ -748,5 +756,4 @@ public class WAManager extends Application {
     public TableView<Article> getArticlesTable() {
         return articlesTable;
     }
-
 }

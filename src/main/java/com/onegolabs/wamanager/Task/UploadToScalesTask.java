@@ -97,7 +97,7 @@ public class UploadToScalesTask extends Task<Void> {
             int code = article.getMaterialNumber();
             String name = article.getName();
             double price = article.getPrice();
-            int life = article.getExpiryDaysCount();
+            int life = article.getScaleExpiryDays();
             boolean htbw = article.getWeighed();
             int discount = 0;
 //            int discount = article.getDiscount();

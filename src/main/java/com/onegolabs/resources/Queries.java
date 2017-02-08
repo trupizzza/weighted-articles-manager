@@ -1,7 +1,7 @@
 package com.onegolabs.resources;
 
-import com.onegolabs.wamanager.exception.SystemCode;
-import com.onegolabs.wamanager.exception.SystemException;
+import com.onegolabs.exception.SystemCode;
+import com.onegolabs.exception.SystemException;
 
 import java.io.File;
 import java.io.FileInputStream;

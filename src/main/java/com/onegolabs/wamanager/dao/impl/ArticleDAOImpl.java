@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class ArticleDAOImpl implements ArticleDAO {
 
+    private final List<Article> articleList = new ArrayList<>();
     private Connection connection;
     private Statement statement;
     private PreparedStatement pStatement;
@@ -28,49 +29,49 @@ public class ArticleDAOImpl implements ArticleDAO {
 
     @Override
     public List<Article> getAllArticles() throws SQLException {
+        articleList.clear();
         query = Queries.getQuery("main");
         connection = ConnectionFactory.getConnection();
         statement = connection.createStatement();
         rs = statement.executeQuery(query);
-        return parseArticles(rs);
+        while (rs.next()) {
+            articleList.add(parseArticle(rs));
+        }
+        return articleList;
     }
 
-    private List<Article> parseArticles(ResultSet rs) throws SQLException {
-        List<Article> articles = new ArrayList<>();
-        while (rs.next()) {
-            Article article = new Article();
-            article.setDescription(rs.getString(ArticleTableColumns.MATDSC));
-            article.setId(rs.getInt(ArticleTableColumns.GID));
-            article.setMaterialNumber(rs.getInt(ArticleTableColumns.MATNO));
-            article.setName(rs.getString(ArticleTableColumns.MATNAM));
-            double materialPrice = rs.getBigDecimal(ArticleTableColumns.PRICE)
-                                     .setScale(2, BigDecimal.ROUND_UNNECESSARY)
-                                     .doubleValue();
-            article.setPrice(materialPrice);
-            article.setWeighed(WAMUtils.getBooleanFlagValue(rs.getString(ArticleTableColumns.HASTOBEWEIGHTED)));
-            article.setPlu(rs.getInt(ArticleTableColumns.SCALEPLU));
-            article.setExpiryDaysCount(rs.getInt(ArticleTableColumns.SCALEEXPIRYDAYS));
-            article.setExpiryDateShop(rs.getString(ArticleTableColumns.EXPDATSHOP));
-            article.setLabelId(rs.getInt(ArticleTableColumns.LABEL));
-            article.setAddNo1(rs.getInt(ArticleTableColumns.ADDNO1));
-            article.setMorePrices(WAMUtils.getBooleanFlagValue(rs.getString(ArticleTableColumns.MOREPRICES)));
-            try {
-                int lifeBoxTotal = Integer.parseInt(rs.getString(ArticleTableColumns.LIFE_BOT_TOTAL));
-                article.setLifeBoxTotal(lifeBoxTotal);
-            } catch (NumberFormatException nfe) {
-                article.setLifeBoxTotal(0);
-            }
-            if (article.getWeighed()) {
-                article.setManufacturerExpiryDate(rs.getString(ArticleTableColumns.EXPDATSHOP2));
-                article.setExpiryDate(rs.getString(ArticleTableColumns.EXPDATE));
-            } else {
-                article.setExpiryDate(rs.getString(ArticleTableColumns.EXPDATSHOP));
-            }
-            article.setExpDaysToScale(rs.getInt(ArticleTableColumns.EXPDAYS2SCALE));
-            article.setDiscount(calculateDiscount(article));
-            articles.add(article);
+    private Article parseArticle(ResultSet rs) throws SQLException {
+        Article article = new Article();
+        article.setName(rs.getString(ArticleTableColumns.MATNAM));
+        article.setDescription(rs.getString(ArticleTableColumns.MATDSC));
+        article.setId(rs.getInt(ArticleTableColumns.GID));
+        article.setMaterialNumber(rs.getInt(ArticleTableColumns.MATNO));
+        double materialPrice = rs.getBigDecimal(ArticleTableColumns.PRICE)
+                                 .setScale(2, BigDecimal.ROUND_UNNECESSARY)
+                                 .doubleValue();
+        article.setPrice(materialPrice);
+        article.setWeighed(WAMUtils.getBooleanFlagValue(rs.getString(ArticleTableColumns.HASTOBEWEIGHTED)));
+        article.setPlu(rs.getInt(ArticleTableColumns.SCALEPLU));
+        article.setScaleExpiryDays(rs.getInt(ArticleTableColumns.SCALEEXPIRYDAYS));
+        article.setExpiryDateShop(rs.getString(ArticleTableColumns.EXPDATSHOP));
+        article.setLabelId(rs.getInt(ArticleTableColumns.LABEL));
+        article.setAddNo1(rs.getInt(ArticleTableColumns.ADDNO1));
+        article.setMorePrices(WAMUtils.getBooleanFlagValue(rs.getString(ArticleTableColumns.MOREPRICES)));
+        try {
+            int lifeBoxTotal = Integer.parseInt(rs.getString(ArticleTableColumns.LIFE_BOT_TOTAL));
+            article.setLifeBoxTotal(lifeBoxTotal);
+        } catch (NumberFormatException nfe) {
+            article.setLifeBoxTotal(0);
         }
-        return articles;
+        if (article.getWeighed()) {
+            article.setManufacturerExpiryDate(rs.getString(ArticleTableColumns.EXPDATSHOP2));
+            article.setExpiryDate(rs.getString(ArticleTableColumns.EXPDATE));
+        } else {
+            article.setExpiryDate(rs.getString(ArticleTableColumns.EXPDATSHOP));
+        }
+        article.setExpDaysToScale(rs.getInt(ArticleTableColumns.EXPDAYS2SCALE));
+        article.setDiscount(calculateDiscount(article));
+        return article;
     }
 
     private int calculateDiscount(Article article) {
@@ -93,10 +94,12 @@ public class ArticleDAOImpl implements ArticleDAO {
         query = Queries.getQuery("updateArticle");
         connection = ConnectionFactory.getConnection();
         pStatement = connection.prepareStatement(query);
+
         pStatement.setString(1, article.getDescription());
         pStatement.setString(2, article.getExpiryDateShop());
         pStatement.setString(3, article.getManufacturerExpiryDate());
         pStatement.setInt(4, article.getId());
+
         rs = statement.executeQuery(query);
     }
 }

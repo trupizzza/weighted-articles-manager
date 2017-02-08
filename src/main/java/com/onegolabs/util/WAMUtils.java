@@ -1,7 +1,7 @@
 package com.onegolabs.util;
 
-import com.onegolabs.wamanager.exception.SystemCode;
-import com.onegolabs.wamanager.exception.SystemException;
+import com.onegolabs.exception.SystemCode;
+import com.onegolabs.exception.SystemException;
 import com.onegolabs.wamanager.scales.ScalesLoader;
 
 import java.net.InetAddress;
